@@ -45,6 +45,8 @@ export const issueStatuses = [
 
 export const reportStatuses = ["GREEN", "YELLOW", "RED"] as const;
 
+export const reportTrends = ["IMPROVING", "STABLE", "DECLINING"] as const;
+
 export type ProjectStatus = (typeof projectStatuses)[number];
 export type WorkItemType = (typeof workItemTypes)[number];
 export type WorkItemStatus = (typeof workItemStatuses)[number];
@@ -54,6 +56,7 @@ export type RiskSeverity = (typeof riskSeverities)[number];
 export type RiskStatus = (typeof riskStatuses)[number];
 export type IssueStatus = (typeof issueStatuses)[number];
 export type ReportStatus = (typeof reportStatuses)[number];
+export type ReportTrend = (typeof reportTrends)[number];
 
 const id = integer("id").primaryKey({ autoIncrement: true });
 const createdAt = integer("created_at", { mode: "timestamp_ms" })
@@ -215,12 +218,24 @@ export const weeklyReports = sqliteTable(
     projectId: integer("project_id")
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
+    week: text("week"),
+    projectName: text("project_name"),
     weekStart: text("week_start").notNull(),
     weekEnd: text("week_end").notNull(),
     overallStatus: text("overall_status")
       .$type<ReportStatus>()
       .notNull()
       .default("GREEN"),
+    progressPercent: integer("progress_percent"),
+    keyAchievements: text("key_achievements"),
+    plannedNotDone: text("planned_not_done"),
+    issuesBlockers: text("issues_blockers"),
+    decisionsNeeded: text("decisions_needed"),
+    nextWeekPlan: text("next_week_plan"),
+    owner: text("owner"),
+    dueTarget: text("due_target"),
+    managementNote: text("management_note"),
+    trend: text("trend").$type<ReportTrend>(),
     summary: text("summary"),
     completedWork: text("completed_work"),
     ongoingWork: text("ongoing_work"),
@@ -237,8 +252,55 @@ export const weeklyReports = sqliteTable(
       "weekly_reports_overall_status_check",
       enumCheck(table.overallStatus.name, reportStatuses),
     ),
+    check("weekly_reports_trend_check", enumCheck(table.trend.name, reportTrends)),
     index("weekly_reports_project_id_idx").on(table.projectId),
     index("weekly_reports_week_start_idx").on(table.weekStart),
+  ],
+);
+
+export const dailyReports = sqliteTable(
+  "daily_reports",
+  {
+    id,
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    reportDate: text("report_date").notNull(),
+    projectName: text("project_name"),
+    workstream: text("workstream"),
+    taskId: text("task_id"),
+    task: text("task").notNull(),
+    owner: text("owner"),
+    planToday: text("plan_today"),
+    actualResult: text("actual_result"),
+    completePercent: integer("complete_percent"),
+    status: text("status").$type<WorkItemStatus>().notNull().default("TODO"),
+    priority: text("priority").$type<Priority>().notNull().default("MEDIUM"),
+    blockerIssue: text("blocker_issue"),
+    risk: text("risk"),
+    supportNeeded: text("support_needed"),
+    nextAction: text("next_action"),
+    dueDate: text("due_date"),
+    health: text("health").$type<ReportStatus>().notNull().default("GREEN"),
+    createdAt,
+    updatedAt,
+  },
+  (table) => [
+    check(
+      "daily_reports_status_check",
+      enumCheck(table.status.name, workItemStatuses),
+    ),
+    check(
+      "daily_reports_priority_check",
+      enumCheck(table.priority.name, priorities),
+    ),
+    check(
+      "daily_reports_health_check",
+      enumCheck(table.health.name, reportStatuses),
+    ),
+    index("daily_reports_project_id_idx").on(table.projectId),
+    index("daily_reports_report_date_idx").on(table.reportDate),
+    index("daily_reports_status_idx").on(table.status),
   ],
 );
 
@@ -248,6 +310,7 @@ export const projectsRelations = relations(projects, ({ many }) => ({
   risks: many(risks),
   issues: many(issues),
   weeklyReports: many(weeklyReports),
+  dailyReports: many(dailyReports),
 }));
 
 export const meetingsRelations = relations(meetings, ({ one, many }) => ({
@@ -286,6 +349,13 @@ export const issuesRelations = relations(issues, ({ one }) => ({
 export const weeklyReportsRelations = relations(weeklyReports, ({ one }) => ({
   project: one(projects, {
     fields: [weeklyReports.projectId],
+    references: [projects.id],
+  }),
+}));
+
+export const dailyReportsRelations = relations(dailyReports, ({ one }) => ({
+  project: one(projects, {
+    fields: [dailyReports.projectId],
     references: [projects.id],
   }),
 }));

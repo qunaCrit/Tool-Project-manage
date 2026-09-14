@@ -60,6 +60,9 @@ export default async function WeeklyReportsPage({
           <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
           <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
           <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
+          <Link href={`/projects/${project.id}/daily-reports`}>
+            <T k="nav.dailyReports" />
+          </Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/weekly-reports`}
@@ -106,6 +109,8 @@ export default async function WeeklyReportsPage({
                 <tr>
                   <th><T k="weeklyReports.week" /></th>
                   <th><T k="weeklyReports.overallStatus" /></th>
+                  <th><T k="weeklyReports.progressPercent" /></th>
+                  <th><T k="weeklyReports.trend" /></th>
                   <th><T k="common.summary" /></th>
                   <th><T k="common.updated" /></th>
                   <th><T k="common.actions" /></th>
@@ -124,6 +129,14 @@ export default async function WeeklyReportsPage({
                           value={report.overallStatus}
                         />
                       </span>
+                    </td>
+                    <td>{report.progressPercent ?? "-"}</td>
+                    <td>
+                      {report.trend ? (
+                        <EnumLabel group="reportTrend" value={report.trend} />
+                      ) : (
+                        "-"
+                      )}
                     </td>
                     <td>{truncate(report.summary)}</td>
                     <td><LocalizedDateTime value={report.updatedAt} /></td>

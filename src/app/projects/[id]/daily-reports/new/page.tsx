@@ -5,10 +5,12 @@ import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { T } from "@/i18n";
-import { MeetingForm } from "../meeting-form";
+import { DailyReportForm } from "../daily-report-form";
 import styles from "../../../../page.module.css";
 
-export default async function NewMeetingPage({
+const todayInput = () => new Date().toISOString().slice(0, 10);
+
+export default async function NewDailyReportPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -35,21 +37,19 @@ export default async function NewMeetingPage({
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
-          <h1><T k="meetings.title" /></h1>
+          <h1><T k="dailyReports.title" /></h1>
         </div>
         <nav className={styles.nav}>
           <Link href="/projects"><T k="nav.projects" /></Link>
           <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
           <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
-          <Link
-            className={styles.activeNavItem}
-            href={`/projects/${project.id}/meetings`}
-          >
-            <T k="nav.meetings" />
-          </Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
           <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
           <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
-          <Link href={`/projects/${project.id}/daily-reports`}>
+          <Link
+            className={styles.activeNavItem}
+            href={`/projects/${project.id}/daily-reports`}
+          >
             <T k="nav.dailyReports" />
           </Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
@@ -62,16 +62,37 @@ export default async function NewMeetingPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2><T k="meetings.new" /></h2>
+            <h2><T k="dailyReports.new" /></h2>
           </div>
           <Link
             className={styles.secondaryButton}
-            href={`/projects/${project.id}/meetings`}
+            href={`/projects/${project.id}/daily-reports`}
           >
-            <T k="meetings.backToMeetings" />
+            <T k="dailyReports.back" />
           </Link>
         </header>
-        <MeetingForm projectId={project.id} />
+        <DailyReportForm
+          projectId={project.id}
+          report={{
+            reportDate: todayInput(),
+            projectName: project.name,
+            workstream: null,
+            taskId: null,
+            task: "",
+            owner: null,
+            planToday: null,
+            actualResult: null,
+            completePercent: null,
+            status: "TODO",
+            priority: "MEDIUM",
+            blockerIssue: null,
+            risk: null,
+            supportNeeded: null,
+            nextAction: null,
+            dueDate: null,
+            health: "GREEN",
+          }}
+        />
       </section>
     </main>
   );

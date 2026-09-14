@@ -65,6 +65,9 @@ export default async function EditIssuePage({
           >
             <T k="nav.issues" />
           </Link>
+          <Link href={`/projects/${project.id}/daily-reports`}>
+            <T k="nav.dailyReports" />
+          </Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
             <T k="nav.weeklyReports" />
           </Link>

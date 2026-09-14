@@ -116,7 +116,8 @@ export function EnumLabel({
     | "riskSeverity"
     | "riskStatus"
     | "issueStatus"
-    | "reportStatus";
+    | "reportStatus"
+    | "reportTrend";
   value: string;
 }) {
   return <T k={`enum.${group}.${value}` as TranslationKey} />;

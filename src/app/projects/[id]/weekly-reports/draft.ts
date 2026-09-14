@@ -1,12 +1,24 @@
 import { and, asc, desc, eq, gte, inArray, lte, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { issues, meetings, risks, workItems } from "@/db/schema";
+import { issues, meetings, projects, risks, workItems } from "@/db/schema";
 
 export type WeeklyReportDraft = {
+  week: string;
+  projectName: string;
   weekStart: string;
   weekEnd: string;
   overallStatus: "GREEN" | "YELLOW" | "RED";
+  progressPercent: number;
+  keyAchievements: string;
+  plannedNotDone: string;
+  issuesBlockers: string;
+  decisionsNeeded: string;
+  nextWeekPlan: string;
+  owner: string;
+  dueTarget: string;
+  managementNote: string;
+  trend: "IMPROVING" | "STABLE" | "DECLINING";
   summary: string;
   completedWork: string;
   ongoingWork: string;
@@ -62,6 +74,15 @@ export async function generateWeeklyReportDraft(
   weekStart: string,
   weekEnd: string,
 ): Promise<WeeklyReportDraft> {
+  const [project] = await db
+    .select({
+      name: projects.name,
+      owner: projects.owner,
+    })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
   const completed = await db
     .select()
     .from(workItems)
@@ -225,11 +246,28 @@ export async function generateWeeklyReportDraft(
     openIssues.some((issue) => issue.priority === "CRITICAL") ||
     openRisks.some((risk) => risk.severity === "HIGH");
   const hasAttentionItems = openIssues.length > 0 || openRisks.length > 0;
+  const totalWorkItems = completed.length + ongoing.length;
+  const progressPercent =
+    totalWorkItems > 0 ? Math.round((completed.length / totalWorkItems) * 100) : 0;
+  const dueTarget = upcoming.find((item) => item.dueDate)?.dueDate ?? "";
+  const overallStatus = hasRedFlags ? "RED" : hasAttentionItems ? "YELLOW" : "GREEN";
 
   return {
+    week: `${weekStart} - ${weekEnd}`,
+    projectName: project?.name ?? "",
     weekStart,
     weekEnd,
-    overallStatus: hasRedFlags ? "RED" : hasAttentionItems ? "YELLOW" : "GREEN",
+    overallStatus,
+    progressPercent,
+    keyAchievements: completedWork,
+    plannedNotDone: ongoingWork,
+    issuesBlockers: issueText,
+    decisionsNeeded: decisionText,
+    nextWeekPlan: upcomingWork,
+    owner: project?.owner ?? "",
+    dueTarget,
+    managementNote: "",
+    trend: overallStatus === "RED" ? "DECLINING" : "STABLE",
     summary: `Weekly status for ${weekStart} to ${weekEnd}. Review the generated sections and adjust before saving this snapshot.`,
     completedWork,
     ongoingWork,

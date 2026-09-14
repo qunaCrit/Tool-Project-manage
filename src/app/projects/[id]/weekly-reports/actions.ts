@@ -8,8 +8,10 @@ import { db } from "@/db";
 import {
   projects,
   reportStatuses,
+  reportTrends,
   weeklyReports,
   type ReportStatus,
+  type ReportTrend,
 } from "@/db/schema";
 
 export type WeeklyReportFormState = {
@@ -18,9 +20,21 @@ export type WeeklyReportFormState = {
 };
 
 type WeeklyReportField =
+  | "week"
+  | "projectName"
   | "weekStart"
   | "weekEnd"
   | "overallStatus"
+  | "progressPercent"
+  | "keyAchievements"
+  | "plannedNotDone"
+  | "issuesBlockers"
+  | "decisionsNeeded"
+  | "nextWeekPlan"
+  | "owner"
+  | "dueTarget"
+  | "managementNote"
+  | "trend"
   | "summary"
   | "completedWork"
   | "ongoingWork"
@@ -32,9 +46,21 @@ type WeeklyReportField =
 
 type WeeklyReportInput = {
   projectId: number;
+  week: string | null;
+  projectName: string | null;
   weekStart: string;
   weekEnd: string;
   overallStatus: ReportStatus;
+  progressPercent: number | null;
+  keyAchievements: string | null;
+  plannedNotDone: string | null;
+  issuesBlockers: string | null;
+  decisionsNeeded: string | null;
+  nextWeekPlan: string | null;
+  owner: string | null;
+  dueTarget: string | null;
+  managementNote: string | null;
+  trend: ReportTrend | null;
   summary: string | null;
   completedWork: string | null;
   ongoingWork: string | null;
@@ -74,14 +100,24 @@ const isValidDateInput = (value: string) => {
   );
 };
 
-const projectExists = async (projectId: number) => {
+const numberOrNull = (formData: FormData, key: WeeklyReportField) => {
+  const value = formData.get(key);
+  if (typeof value !== "string" || value.trim() === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : null;
+};
+
+const findProject = async (projectId: number) => {
   const [project] = await db
-    .select({ id: projects.id })
+    .select({ id: projects.id, name: projects.name })
     .from(projects)
     .where(eq(projects.id, projectId))
     .limit(1);
 
-  return Boolean(project);
+  return project;
 };
 
 const validateWeeklyReportInput = async (
@@ -98,6 +134,15 @@ const validateWeeklyReportInput = async (
     typeof rawOverallStatus === "string" &&
     reportStatuses.includes(rawOverallStatus as ReportStatus)
       ? (rawOverallStatus as ReportStatus)
+      : null;
+  const progressPercent = numberOrNull(formData, "progressPercent");
+  const rawProgressPercent = formData.get("progressPercent");
+  const rawTrend = formData.get("trend");
+  const trend =
+    typeof rawTrend === "string" && rawTrend.trim() !== ""
+      ? reportTrends.includes(rawTrend as ReportTrend)
+        ? (rawTrend as ReportTrend)
+        : null
       : null;
 
   if (!weekStart || !isValidDateInput(weekStart)) {
@@ -122,6 +167,18 @@ const validateWeeklyReportInput = async (
     fieldErrors.overallStatus = "validation.overallStatusInvalid";
   }
 
+  if (
+    typeof rawProgressPercent === "string" &&
+    rawProgressPercent.trim() !== "" &&
+    (progressPercent === null || progressPercent < 0 || progressPercent > 100)
+  ) {
+    fieldErrors.progressPercent = "validation.progressPercentInvalid";
+  }
+
+  if (typeof rawTrend === "string" && rawTrend.trim() !== "" && !trend) {
+    fieldErrors.trend = "validation.trendInvalid";
+  }
+
   if (Object.keys(fieldErrors).length > 0 || !overallStatus) {
     return {
       ok: false,
@@ -132,7 +189,9 @@ const validateWeeklyReportInput = async (
     };
   }
 
-  if (!(await projectExists(projectId))) {
+  const project = await findProject(projectId);
+
+  if (!project) {
     return {
       ok: false,
       state: {
@@ -141,21 +200,40 @@ const validateWeeklyReportInput = async (
     };
   }
 
+  const keyAchievements = textOrNull(formData, "keyAchievements");
+  const plannedNotDone = textOrNull(formData, "plannedNotDone");
+  const issuesBlockers = textOrNull(formData, "issuesBlockers");
+  const decisionsNeeded = textOrNull(formData, "decisionsNeeded");
+  const nextWeekPlan = textOrNull(formData, "nextWeekPlan");
+  const managementNote = textOrNull(formData, "managementNote");
+
   return {
     ok: true,
     input: {
       projectId,
+      week: textOrNull(formData, "week"),
+      projectName: textOrNull(formData, "projectName") ?? project.name,
       weekStart,
       weekEnd,
       overallStatus,
+      progressPercent,
+      keyAchievements,
+      plannedNotDone,
+      issuesBlockers,
+      decisionsNeeded,
+      nextWeekPlan,
+      owner: textOrNull(formData, "owner"),
+      dueTarget: textOrNull(formData, "dueTarget"),
+      managementNote,
+      trend,
       summary: textOrNull(formData, "summary"),
-      completedWork: textOrNull(formData, "completedWork"),
-      ongoingWork: textOrNull(formData, "ongoingWork"),
-      upcomingWork: textOrNull(formData, "upcomingWork"),
+      completedWork: keyAchievements,
+      ongoingWork: plannedNotDone,
+      upcomingWork: nextWeekPlan,
       risks: textOrNull(formData, "risks"),
-      issues: textOrNull(formData, "issues"),
-      decisions: textOrNull(formData, "decisions"),
-      notes: textOrNull(formData, "notes"),
+      issues: issuesBlockers,
+      decisions: decisionsNeeded,
+      notes: managementNote,
     },
   };
 };

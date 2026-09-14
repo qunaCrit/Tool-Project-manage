@@ -56,6 +56,9 @@ export default async function NewWeeklyReportPage({
           <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
           <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
           <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
+          <Link href={`/projects/${project.id}/daily-reports`}>
+            <T k="nav.dailyReports" />
+          </Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/weekly-reports`}
