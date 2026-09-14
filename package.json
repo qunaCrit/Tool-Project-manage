@@ -1,14 +1,38 @@
 {
   "name": "tool-project-manage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
+  "main": "electron/main.mjs",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "electron:dev": "electron .",
+    "electron:build": "npm run build && node electron/prepare-standalone.mjs && electron-builder --mac --arm64",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate"
+  },
+  "build": {
+    "appId": "com.local.tool-project-manage",
+    "productName": "Tool Project Manage",
+    "asar": false,
+    "files": [
+      "electron/**/*",
+      ".next/standalone/**/*",
+      ".next/static/**/*",
+      "drizzle/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dir",
+        "dmg"
+      ]
+    },
+    "directories": {
+      "output": "dist"
+    }
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
@@ -23,6 +47,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.10",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "typescript": "^5"

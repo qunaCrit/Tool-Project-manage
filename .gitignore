@@ -19,6 +19,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -34,6 +35,8 @@ yarn-error.log*
 .env*
 
 # local database
+*.db
+*.db-*
 /data/*.db
 /data/*.db-*
 
