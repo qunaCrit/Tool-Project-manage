@@ -120,7 +120,9 @@
 .panel,
 .placeholderPanel,
 .tableWrap,
-.form {
+.form,
+.inlineForm,
+.minutesSection {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
@@ -228,6 +230,13 @@
   padding: 24px;
 }
 
+.inlineForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+
 .formGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -264,7 +273,8 @@
 }
 
 .field input[aria-invalid="true"],
-.field select[aria-invalid="true"] {
+.field select[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
   border-color: #dc2626;
 }
 
@@ -333,6 +343,37 @@
 
 .placeholderPanel {
   min-height: 110px;
+}
+
+.minutes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 980px;
+}
+
+.minutesSection {
+  padding: 20px;
+}
+
+.minutesSection h3,
+.sectionDivider h3 {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.minutesSection p {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 10px;
+  white-space: pre-wrap;
+}
+
+.sectionDivider {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 20px;
+  padding-top: 20px;
 }
 
 @media (max-width: 900px) {

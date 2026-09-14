@@ -3,24 +3,24 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db";
-import { projects, workItems } from "@/db/schema";
-import { WorkItemForm } from "../../work-item-form";
+import { meetings, projects } from "@/db/schema";
+import { MeetingForm } from "../../meeting-form";
 import styles from "../../../../../page.module.css";
 
-export default async function EditWorkItemPage({
+export default async function EditMeetingPage({
   params,
 }: {
-  params: Promise<{ id: string; workItemId: string }>;
+  params: Promise<{ id: string; meetingId: string }>;
 }) {
-  const { id, workItemId } = await params;
+  const { id, meetingId } = await params;
   const projectId = Number(id);
-  const selectedWorkItemId = Number(workItemId);
+  const selectedMeetingId = Number(meetingId);
 
   if (
     !Number.isInteger(projectId) ||
     projectId <= 0 ||
-    !Number.isInteger(selectedWorkItemId) ||
-    selectedWorkItemId <= 0
+    !Number.isInteger(selectedMeetingId) ||
+    selectedMeetingId <= 0
   ) {
     notFound();
   }
@@ -35,18 +35,15 @@ export default async function EditWorkItemPage({
     notFound();
   }
 
-  const [workItem] = await db
+  const [meeting] = await db
     .select()
-    .from(workItems)
+    .from(meetings)
     .where(
-      and(
-        eq(workItems.id, selectedWorkItemId),
-        eq(workItems.projectId, project.id),
-      ),
+      and(eq(meetings.id, selectedMeetingId), eq(meetings.projectId, project.id)),
     )
     .limit(1);
 
-  if (!workItem) {
+  if (!meeting) {
     notFound();
   }
 
@@ -55,18 +52,18 @@ export default async function EditWorkItemPage({
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Work Items</h1>
+          <h1>Meetings</h1>
         </div>
         <nav className={styles.nav}>
           <Link href="/projects">Projects</Link>
           <Link href={`/projects/${project.id}`}>Project Overview</Link>
+          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
           <Link
             className={styles.activeNavItem}
-            href={`/projects/${project.id}/work-items`}
+            href={`/projects/${project.id}/meetings`}
           >
-            Work Items
+            Meetings
           </Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
           <span>Risks</span>
           <span>Issues</span>
           <span>Weekly Reports</span>
@@ -77,16 +74,24 @@ export default async function EditWorkItemPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Edit work item</h2>
+            <h2>Edit meeting</h2>
           </div>
-          <Link
-            className={styles.secondaryButton}
-            href={`/projects/${project.id}/work-items`}
-          >
-            Back to work items
-          </Link>
+          <div className={styles.actionRow}>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/meetings/${meeting.id}`}
+            >
+              Back to meeting
+            </Link>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/meetings`}
+            >
+              Back to meetings
+            </Link>
+          </div>
         </header>
-        <WorkItemForm projectId={project.id} workItem={workItem} />
+        <MeetingForm projectId={project.id} meeting={meeting} />
       </section>
     </main>
   );

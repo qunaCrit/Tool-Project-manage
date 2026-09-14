@@ -50,8 +50,8 @@ export default async function ProjectDetailPage({
           <Link className={styles.activeNavItem} href={`/projects/${project.id}`}>
             Project Overview
           </Link>
-          <span>Work Items</span>
-          <span>Meetings</span>
+          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
+          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
           <span>Risks</span>
           <span>Issues</span>
           <span>Weekly Reports</span>
@@ -73,6 +73,12 @@ export default async function ProjectDetailPage({
               href={`/projects/${project.id}/work-items`}
             >
               Work Items
+            </Link>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/meetings`}
+            >
+              Meetings
             </Link>
             <Link className={styles.primaryButton} href={`/projects/${project.id}/edit`}>
               Edit Project
@@ -124,7 +130,7 @@ export default async function ProjectDetailPage({
         </section>
 
         <section className={styles.placeholderGrid}>
-          {["Meetings", "Risks", "Issues", "Weekly Reports"].map(
+          {["Risks", "Issues", "Weekly Reports"].map(
             (moduleName) => (
               <div className={styles.placeholderPanel} key={moduleName}>
                 <h3>{moduleName}</h3>
@@ -142,6 +148,16 @@ export default async function ProjectDetailPage({
               href={`/projects/${project.id}/work-items`}
             >
               View Work Items
+            </Link>
+          </div>
+          <div className={styles.placeholderPanel}>
+            <h3>Meetings</h3>
+            <p>Capture meeting minutes and create linked action items.</p>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/meetings`}
+            >
+              View Meetings
             </Link>
           </div>
         </section>

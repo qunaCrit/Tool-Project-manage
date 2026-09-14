@@ -87,6 +87,7 @@ const projectExists = async (projectId: number) => {
 const validateWorkItemInput = async (
   projectId: number,
   formData: FormData,
+  existingMeetingId?: number | null,
   existingCompletedAt?: Date | null,
 ): Promise<WorkItemValidationResult> => {
   const fieldErrors: WorkItemFormState["fieldErrors"] = {};
@@ -154,7 +155,7 @@ const validateWorkItemInput = async (
     ok: true,
     input: {
       projectId,
-      meetingId: null,
+      meetingId: existingMeetingId ?? null,
       type,
       title,
       description: textOrNull(formData, "description"),
@@ -199,7 +200,7 @@ export async function updateWorkItemAction(
   formData: FormData,
 ): Promise<WorkItemFormState> {
   const [existingWorkItem] = await db
-    .select({ completedAt: workItems.completedAt })
+    .select({ meetingId: workItems.meetingId, completedAt: workItems.completedAt })
     .from(workItems)
     .where(and(eq(workItems.id, workItemId), eq(workItems.projectId, projectId)))
     .limit(1);
@@ -213,6 +214,7 @@ export async function updateWorkItemAction(
   const input = await validateWorkItemInput(
     projectId,
     formData,
+    existingWorkItem.meetingId,
     existingWorkItem.completedAt,
   );
 
