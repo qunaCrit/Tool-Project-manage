@@ -8,28 +8,13 @@ import {
   issues,
   priorities,
   projects,
-  type IssueStatus,
-  type Priority,
 } from "@/db/schema";
+import { EnumLabel, T } from "@/i18n";
 import { DeleteIssueButton } from "./delete-issue-button";
 import styles from "../../../page.module.css";
 
-const priorityLabels: Record<Priority, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  CRITICAL: "Critical",
-};
-
-const statusLabels: Record<IssueStatus, string> = {
-  OPEN: "Open",
-  IN_PROGRESS: "In progress",
-  RESOLVED: "Resolved",
-  CLOSED: "Closed",
-};
-
-const errorMessages: Record<string, string> = {
-  "delete-failed": "Could not delete the issue. Please try again.",
+const errorMessageKeys: Record<string, Parameters<typeof T>[0]["k"]> = {
+  "delete-failed": "error.issueDeleteFailed",
 };
 
 const formatValue = (value: string | null) => value || "-";
@@ -92,23 +77,23 @@ export default async function IssuesPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Issues</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="issues.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/issues`}
           >
-            Issues
+            <T k="nav.issues" />
           </Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -117,45 +102,45 @@ export default async function IssuesPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Issues</h2>
+            <h2><T k="issues.title" /></h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-              Back to overview
+              <T k="common.backToOverview" />
             </Link>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/issues/new`}
             >
-              Add Issue
+              <T k="issues.add" />
             </Link>
           </div>
         </header>
 
-        {error && errorMessages[error] ? (
-          <p className={styles.formError}>{errorMessages[error]}</p>
+        {error && errorMessageKeys[error] ? (
+          <p className={styles.formError}><T k={errorMessageKeys[error]} /></p>
         ) : null}
 
         <form className={styles.filterBar}>
           <label className={styles.field}>
-            <span>Status</span>
+            <span><T k="common.status" /></span>
             <select name="status" defaultValue={selectedStatus ?? ""}>
-              <option value="">All statuses</option>
+              <option value=""><T k="projects.allStatuses" /></option>
               {issueStatuses.map((issueStatus) => (
                 <option key={issueStatus} value={issueStatus}>
-                  {statusLabels[issueStatus]}
+                  <EnumLabel group="issueStatus" value={issueStatus} />
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Priority</span>
+            <span><T k="common.priority" /></span>
             <select name="priority" defaultValue={selectedPriority ?? ""}>
-              <option value="">All priorities</option>
+              <option value=""><T k="workItems.allPriorities" /></option>
               {priorities.map((issuePriority) => (
                 <option key={issuePriority} value={issuePriority}>
-                  {priorityLabels[issuePriority]}
+                  <EnumLabel group="priority" value={issuePriority} />
                 </option>
               ))}
             </select>
@@ -163,26 +148,26 @@ export default async function IssuesPage({
 
           <div className={styles.filterActions}>
             <button className={styles.primaryButton} type="submit">
-              Apply filters
+              <T k="common.applyFilters" />
             </button>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/issues`}
             >
-              Reset
+              <T k="common.reset" />
             </Link>
           </div>
         </form>
 
         {issueList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No issues found</h3>
-            <p>Add the first issue for this project.</p>
+            <h3><T k="issues.noFoundTitle" /></h3>
+            <p><T k="issues.noFoundBody" /></p>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/issues/new`}
             >
-              Add Issue
+              <T k="issues.add" />
             </Link>
           </div>
         ) : (
@@ -190,13 +175,13 @@ export default async function IssuesPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Priority</th>
-                  <th>Impact</th>
-                  <th>Owner</th>
-                  <th>Status</th>
-                  <th>Due date</th>
-                  <th>Actions</th>
+                  <th><T k="common.title" /></th>
+                  <th><T k="common.priority" /></th>
+                  <th><T k="issues.impact" /></th>
+                  <th><T k="common.owner" /></th>
+                  <th><T k="common.status" /></th>
+                  <th><T k="common.due" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
@@ -210,12 +195,12 @@ export default async function IssuesPage({
                         {issue.title}
                       </Link>
                     </td>
-                    <td>{priorityLabels[issue.priority]}</td>
+                    <td><EnumLabel group="priority" value={issue.priority} /></td>
                     <td>{formatValue(issue.impact)}</td>
                     <td>{formatValue(issue.owner)}</td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[issue.status]}
+                        <EnumLabel group="issueStatus" value={issue.status} />
                       </span>
                     </td>
                     <td>{formatValue(issue.dueDate)}</td>
@@ -225,7 +210,7 @@ export default async function IssuesPage({
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/issues/${issue.id}/edit`}
                         >
-                          Edit
+                          <T k="common.edit" />
                         </Link>
                         <DeleteIssueButton
                           projectId={project.id}

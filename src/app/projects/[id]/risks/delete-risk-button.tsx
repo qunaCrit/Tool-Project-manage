@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/i18n";
 import { deleteRiskAction } from "./actions";
 import styles from "../../../page.module.css";
 
@@ -12,11 +13,13 @@ export function DeleteRiskButton({
   riskId: number;
   riskTitle: string;
 }) {
+  const { t } = useTranslation();
+
   return (
     <form
       action={deleteRiskAction}
       onSubmit={(event) => {
-        if (!window.confirm(`Delete risk "${riskTitle}"?`)) {
+        if (!window.confirm(t("risks.deleteConfirm", { title: riskTitle }))) {
           event.preventDefault();
         }
       }}
@@ -24,7 +27,7 @@ export function DeleteRiskButton({
       <input name="projectId" type="hidden" value={projectId} />
       <input name="riskId" type="hidden" value={riskId} />
       <button className={styles.dangerButton} type="submit">
-        Delete
+        {t("common.delete")}
       </button>
     </form>
   );

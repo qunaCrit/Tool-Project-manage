@@ -10,75 +10,14 @@ import {
   risks,
   weeklyReports,
   workItems,
-  type IssueStatus,
-  type ProjectStatus,
-  type ReportStatus,
-  type RiskSeverity,
-  type RiskStatus,
-  type WorkItemStatus,
 } from "@/db/schema";
+import { EnumLabel, LocalizedDate, LocalizedDateTime, T } from "@/i18n";
 import { DeleteProjectButton } from "../delete-project-button";
 import styles from "../../page.module.css";
 
-const statusLabels: Record<ProjectStatus, string> = {
-  PLANNING: "Planning",
-  ACTIVE: "Active",
-  ON_HOLD: "On hold",
-  COMPLETED: "Completed",
-};
-
-const workItemStatusLabels: Record<WorkItemStatus, string> = {
-  TODO: "Todo",
-  IN_PROGRESS: "In progress",
-  DONE: "Done",
-  BLOCKED: "Blocked",
-};
-
-const riskStatusLabels: Record<RiskStatus, string> = {
-  OPEN: "Open",
-  MONITORING: "Monitoring",
-  MITIGATED: "Mitigated",
-  CLOSED: "Closed",
-};
-
-const riskSeverityLabels: Record<RiskSeverity, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-const issueStatusLabels: Record<IssueStatus, string> = {
-  OPEN: "Open",
-  IN_PROGRESS: "In progress",
-  RESOLVED: "Resolved",
-  CLOSED: "Closed",
-};
-
-const reportStatusLabels: Record<ReportStatus, string> = {
-  GREEN: "Green",
-  YELLOW: "Yellow",
-  RED: "Red",
-};
-
 const formatValue = (value: string | null) => value || "-";
 
-const formatDate = (value: string | null) => {
-  if (!value) {
-    return "-";
-  }
-
-  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(
-    new Date(`${value}T00:00:00`),
-  );
-};
-
 const todayInput = () => new Date().toISOString().slice(0, 10);
-
-const formatDateTime = (value: Date) =>
-  new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 
 const truncate = (value: string | null, maxLength = 140) => {
   if (!value) {
@@ -184,20 +123,20 @@ export default async function ProjectDetailPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Overview</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="nav.overview" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
           <Link className={styles.activeNavItem} href={`/projects/${project.id}`}>
-            Project Overview
+            <T k="nav.overview" />
           </Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -205,45 +144,45 @@ export default async function ProjectDetailPage({
       <section className={styles.content}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Project Detail</p>
+            <p className={styles.eyebrow}><T k="projects.detail" /></p>
             <h2>{project.name}</h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href="/projects">
-              Project List
+              <T k="projects.projectList" />
             </Link>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/work-items`}
             >
-              Work Items
+              <T k="nav.workItems" />
             </Link>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/meetings`}
             >
-              Meetings
+              <T k="nav.meetings" />
             </Link>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/risks`}
             >
-              Risks
+              <T k="nav.risks" />
             </Link>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/issues`}
             >
-              Issues
+              <T k="nav.issues" />
             </Link>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/weekly-reports/new`}
             >
-              Generate Weekly Report
+              <T k="weeklyReports.generate" />
             </Link>
             <Link className={styles.primaryButton} href={`/projects/${project.id}/edit`}>
-              Edit Project
+              <T k="projects.edit" />
             </Link>
             <DeleteProjectButton projectId={project.id} projectName={project.name} />
           </div>
@@ -252,41 +191,43 @@ export default async function ProjectDetailPage({
         <section className={styles.overviewGrid}>
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Project Summary</h3>
-              <span className={styles.statusPill}>{statusLabels[project.status]}</span>
+              <h3><T k="projects.summary" /></h3>
+              <span className={styles.statusPill}>
+                <EnumLabel group="projectStatus" value={project.status} />
+              </span>
             </div>
             <dl className={styles.detailList}>
               <div>
-                <dt>Owner</dt>
+                <dt><T k="common.owner" /></dt>
                 <dd>{formatValue(project.owner)}</dd>
               </div>
               <div>
-                <dt>Customer</dt>
+                <dt><T k="projects.customer" /></dt>
                 <dd>{formatValue(project.customer)}</dd>
               </div>
               <div>
-                <dt>Start date</dt>
-                <dd>{formatDate(project.startDate)}</dd>
+                <dt><T k="projects.startDate" /></dt>
+                <dd><LocalizedDate value={project.startDate} /></dd>
               </div>
               <div>
-                <dt>End date</dt>
-                <dd>{formatDate(project.endDate)}</dd>
+                <dt><T k="projects.endDate" /></dt>
+                <dd><LocalizedDate value={project.endDate} /></dd>
               </div>
             </dl>
           </div>
 
           <div className={styles.panel}>
-            <h3>Description</h3>
+            <h3><T k="projects.description" /></h3>
             <p>{formatValue(project.description)}</p>
           </div>
 
           <div className={styles.panel}>
-            <h3>Objective</h3>
+            <h3><T k="projects.objective" /></h3>
             <p>{formatValue(project.objective)}</p>
           </div>
 
           <div className={styles.panel}>
-            <h3>Health Note</h3>
+            <h3><T k="projects.healthNote" /></h3>
             <p>{formatValue(project.healthNote)}</p>
           </div>
         </section>
@@ -294,60 +235,65 @@ export default async function ProjectDetailPage({
         <section className={styles.overviewGrid}>
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Work Items</h3>
+              <h3><T k="nav.workItems" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/work-items`}
               >
-                View Work Items
+                <T k="overview.viewWorkItems" />
               </Link>
             </div>
             <div className={styles.metricGrid}>
               <div>
                 <strong>{workSummary.total}</strong>
-                <span>Total</span>
+                <span><T k="common.total" /></span>
               </div>
               <div>
                 <strong>{workSummary.todo}</strong>
-                <span>Todo</span>
+                <span><EnumLabel group="workItemStatus" value="TODO" /></span>
               </div>
               <div>
                 <strong>{workSummary.inProgress}</strong>
-                <span>In progress</span>
+                <span><EnumLabel group="workItemStatus" value="IN_PROGRESS" /></span>
               </div>
               <div>
                 <strong>{workSummary.done}</strong>
-                <span>Done</span>
+                <span><EnumLabel group="workItemStatus" value="DONE" /></span>
               </div>
               <div>
                 <strong>{workSummary.overdue}</strong>
-                <span>Overdue</span>
+                <span><T k="common.overdue" /></span>
               </div>
             </div>
-            <div className={styles.progressTrack} aria-label="Work completion">
+            <div className={styles.progressTrack} aria-label="work-completion">
               <span style={{ width: `${completion}%` }} />
             </div>
-            <p>{completion}% complete, {workSummary.blocked} blocked.</p>
+            <p>
+              <T
+                k="overview.completeBlocked"
+                values={{ completion, blocked: workSummary.blocked }}
+              />
+            </p>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Risks</h3>
+              <h3><T k="nav.risks" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/risks`}
               >
-                View Risks
+                <T k="overview.viewRisks" />
               </Link>
             </div>
             <div className={styles.metricGrid}>
               <div>
                 <strong>{openRisks.length}</strong>
-                <span>Open</span>
+                <span><EnumLabel group="riskStatus" value="OPEN" /></span>
               </div>
               <div>
                 <strong>{highRisks.length}</strong>
-                <span>High severity</span>
+                <span><T k="overview.highSeverity" /></span>
               </div>
             </div>
             <ul className={styles.compactList}>
@@ -357,37 +303,37 @@ export default async function ProjectDetailPage({
                     {risk.title}
                   </Link>
                   <span>
-                    {riskSeverityLabels[risk.severity]} |{" "}
-                    {riskStatusLabels[risk.status]}
+                    <EnumLabel group="riskSeverity" value={risk.severity} /> |{" "}
+                    <EnumLabel group="riskStatus" value={risk.status} />
                   </span>
                 </li>
               ))}
-              {highRisks.length === 0 ? <li>No high severity risks.</li> : null}
+              {highRisks.length === 0 ? <li><T k="overview.noHighRisks" /></li> : null}
             </ul>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Issues</h3>
+              <h3><T k="nav.issues" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/issues`}
               >
-                View Issues
+                <T k="overview.viewIssues" />
               </Link>
             </div>
             <div className={styles.metricGrid}>
               <div>
                 <strong>{openIssues.length}</strong>
-                <span>Open</span>
+                <span><EnumLabel group="issueStatus" value="OPEN" /></span>
               </div>
               <div>
                 <strong>{overdueIssues.length}</strong>
-                <span>Overdue</span>
+                <span><T k="common.overdue" /></span>
               </div>
               <div>
                 <strong>{unassignedIssues.length}</strong>
-                <span>No owner</span>
+                <span><T k="common.noOwner" /></span>
               </div>
             </div>
             <ul className={styles.compactList}>
@@ -396,21 +342,21 @@ export default async function ProjectDetailPage({
                   <Link href={`/projects/${project.id}/issues/${issue.id}/edit`}>
                     {issue.title}
                   </Link>
-                  <span>{issueStatusLabels[issue.status]}</span>
+                  <span><EnumLabel group="issueStatus" value={issue.status} /></span>
                 </li>
               ))}
-              {openIssues.length === 0 ? <li>No open issues.</li> : null}
+              {openIssues.length === 0 ? <li><T k="overview.noOpenIssues" /></li> : null}
             </ul>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Recent Meetings</h3>
+              <h3><T k="overview.recentMeetings" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/meetings`}
               >
-                View Meetings
+                <T k="overview.viewMeetings" />
               </Link>
             </div>
             <ul className={styles.compactList}>
@@ -420,49 +366,58 @@ export default async function ProjectDetailPage({
                     {meeting.title}
                   </Link>
                   <span>
-                    {formatDateTime(meeting.meetingDate)} |{" "}
-                    {actionItemCountByMeeting.get(meeting.id) ?? 0} action items
+                    <LocalizedDateTime value={meeting.meetingDate} /> |{" "}
+                    <T
+                      k="meetings.actionItemCount"
+                      values={{
+                        count: actionItemCountByMeeting.get(meeting.id) ?? 0,
+                      }}
+                    />
                   </span>
                 </li>
               ))}
-              {recentMeetings.length === 0 ? <li>No meetings yet.</li> : null}
+              {recentMeetings.length === 0 ? <li><T k="overview.noMeetings" /></li> : null}
             </ul>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Latest Weekly Report</h3>
+              <h3><T k="overview.latestWeeklyReport" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/weekly-reports`}
               >
-                View Reports
+                <T k="overview.viewReports" />
               </Link>
             </div>
             {latestWeeklyReport ? (
               <div className={styles.stack}>
                 <span className={styles.statusPill}>
-                  {reportStatusLabels[latestWeeklyReport.overallStatus]}
+                  <EnumLabel
+                    group="reportStatus"
+                    value={latestWeeklyReport.overallStatus}
+                  />
                 </span>
                 <p>
-                  {latestWeeklyReport.weekStart} to {latestWeeklyReport.weekEnd}
+                  {latestWeeklyReport.weekStart} <T k="common.to" />{" "}
+                  {latestWeeklyReport.weekEnd}
                 </p>
                 <p>{truncate(latestWeeklyReport.summary)}</p>
                 <Link
                   className={styles.secondaryButton}
                   href={`/projects/${project.id}/weekly-reports/${latestWeeklyReport.id}`}
                 >
-                  Open Latest Report
+                  <T k="overview.openLatestReport" />
                 </Link>
               </div>
             ) : (
               <div className={styles.stack}>
-                <p>No weekly reports yet.</p>
+                <p><T k="overview.noWeeklyReports" /></p>
                 <Link
                   className={styles.primaryButton}
                   href={`/projects/${project.id}/weekly-reports/new`}
                 >
-                  Generate Weekly Report
+                  <T k="weeklyReports.generate" />
                 </Link>
               </div>
             )}
@@ -470,12 +425,12 @@ export default async function ProjectDetailPage({
 
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
-              <h3>Upcoming Deadlines</h3>
+              <h3><T k="overview.upcomingDeadlines" /></h3>
               <Link
                 className={styles.secondaryButton}
                 href={`/projects/${project.id}/work-items`}
               >
-                View All
+                <T k="overview.viewAll" />
               </Link>
             </div>
             <ul className={styles.compactList}>
@@ -491,13 +446,18 @@ export default async function ProjectDetailPage({
                         : undefined
                     }
                   >
-                    {item.dueDate && item.dueDate < today ? "Overdue" : "Due"}{" "}
-                    {formatDate(item.dueDate)} | {workItemStatusLabels[item.status]}
+                    {item.dueDate && item.dueDate < today ? (
+                      <T k="common.overdue" />
+                    ) : (
+                      <T k="common.due" />
+                    )}{" "}
+                    <LocalizedDate value={item.dueDate} /> |{" "}
+                    <EnumLabel group="workItemStatus" value={item.status} />
                   </span>
                 </li>
               ))}
               {upcomingWorkItems.length === 0 ? (
-                <li>No upcoming work item deadlines.</li>
+                <li><T k="overview.noUpcomingDeadlines" /></li>
               ) : null}
             </ul>
           </div>

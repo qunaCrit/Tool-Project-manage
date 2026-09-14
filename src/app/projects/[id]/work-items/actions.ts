@@ -113,30 +113,30 @@ const validateWorkItemInput = async (
   const dueDate = textOrNull(formData, "dueDate");
 
   if (!title) {
-    fieldErrors.title = "Title is required.";
+    fieldErrors.title = "validation.titleRequired";
   }
 
   if (!type) {
-    fieldErrors.type = "Type is invalid.";
+    fieldErrors.type = "validation.typeInvalid";
   }
 
   if (!status) {
-    fieldErrors.status = "Status is invalid.";
+    fieldErrors.status = "validation.statusInvalid";
   }
 
   if (!priority) {
-    fieldErrors.priority = "Priority is invalid.";
+    fieldErrors.priority = "validation.priorityInvalid";
   }
 
   if (dueDate && !isValidDateInput(dueDate)) {
-    fieldErrors.dueDate = "Due date must be a valid date.";
+    fieldErrors.dueDate = "validation.dueDateInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !type || !status || !priority) {
     return {
       ok: false,
       state: {
-        error: "Please check the work item information.",
+        error: "validation.workItemCheck",
         fieldErrors,
       },
     };
@@ -146,7 +146,7 @@ const validateWorkItemInput = async (
     return {
       ok: false,
       state: {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       },
     };
   }
@@ -184,7 +184,7 @@ export async function createWorkItemAction(
     await db.insert(workItems).values(input.input);
   } catch {
     return {
-      error: "Could not create the work item. Please try again.",
+      error: "validation.workItemCreateFailed",
     };
   }
 
@@ -207,7 +207,7 @@ export async function updateWorkItemAction(
 
   if (!existingWorkItem) {
     return {
-      error: "Work item was not found.",
+      error: "validation.workItemNotFound",
     };
   }
 
@@ -231,12 +231,12 @@ export async function updateWorkItemAction(
 
     if (!updatedWorkItem) {
       return {
-        error: "Work item was not found.",
+        error: "validation.workItemNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the work item. Please try again.",
+      error: "validation.workItemUpdateFailed",
     };
   }
 

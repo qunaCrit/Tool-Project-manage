@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/db";
 import { projects } from "@/db/schema";
+import { T } from "@/i18n";
 import { MeetingForm } from "../meeting-form";
 import styles from "../../../../page.module.css";
 
@@ -33,23 +34,23 @@ export default async function NewMeetingPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Meetings</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="meetings.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/meetings`}
           >
-            Meetings
+            <T k="nav.meetings" />
           </Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -58,13 +59,13 @@ export default async function NewMeetingPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>New meeting</h2>
+            <h2><T k="meetings.new" /></h2>
           </div>
           <Link
             className={styles.secondaryButton}
             href={`/projects/${project.id}/meetings`}
           >
-            Back to meetings
+            <T k="meetings.backToMeetings" />
           </Link>
         </header>
         <MeetingForm projectId={project.id} />

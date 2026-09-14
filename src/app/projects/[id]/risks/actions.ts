@@ -109,30 +109,30 @@ const validateRiskInput = async (
   const dueDate = textOrNull(formData, "dueDate");
 
   if (!title) {
-    fieldErrors.title = "Title is required.";
+    fieldErrors.title = "validation.titleRequired";
   }
 
   if (!probability) {
-    fieldErrors.probability = "Probability is invalid.";
+    fieldErrors.probability = "validation.probabilityInvalid";
   }
 
   if (!impact) {
-    fieldErrors.impact = "Impact is invalid.";
+    fieldErrors.impact = "validation.impactInvalid";
   }
 
   if (!status) {
-    fieldErrors.status = "Status is invalid.";
+    fieldErrors.status = "validation.statusInvalid";
   }
 
   if (dueDate && !isValidDateInput(dueDate)) {
-    fieldErrors.dueDate = "Due date must be a valid date.";
+    fieldErrors.dueDate = "validation.dueDateInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !probability || !impact || !status) {
     return {
       ok: false,
       state: {
-        error: "Please check the risk information.",
+        error: "validation.riskCheck",
         fieldErrors,
       },
     };
@@ -142,7 +142,7 @@ const validateRiskInput = async (
     return {
       ok: false,
       state: {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       },
     };
   }
@@ -179,7 +179,7 @@ export async function createRiskAction(
     await db.insert(risks).values(input.input);
   } catch {
     return {
-      error: "Could not create the risk. Please try again.",
+      error: "validation.riskCreateFailed",
     };
   }
 
@@ -202,7 +202,7 @@ export async function updateRiskAction(
 
   if (!existingRisk) {
     return {
-      error: "Risk was not found.",
+      error: "validation.riskNotFound",
     };
   }
 
@@ -221,12 +221,12 @@ export async function updateRiskAction(
 
     if (!updatedRisk) {
       return {
-        error: "Risk was not found.",
+        error: "validation.riskNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the risk. Please try again.",
+      error: "validation.riskUpdateFailed",
     };
   }
 

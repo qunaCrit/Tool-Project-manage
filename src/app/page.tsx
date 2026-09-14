@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { T } from "@/i18n";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -7,34 +8,33 @@ export default function Home() {
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Tool Project Manage</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="app.name" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <span>Project Overview</span>
-          <span>Work Items</span>
-          <span>Meetings</span>
-          <span>Risks</span>
-          <span>Issues</span>
-          <span>Weekly Reports</span>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <span><T k="nav.overview" /></span>
+          <span><T k="nav.workItems" /></span>
+          <span><T k="nav.meetings" /></span>
+          <span><T k="nav.risks" /></span>
+          <span><T k="nav.issues" /></span>
+          <span><T k="nav.weeklyReports" /></span>
         </nav>
       </aside>
       <section className={styles.content}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>MVP foundation</p>
-            <h2>Project Management Assistant</h2>
+            <p className={styles.eyebrow}><T k="app.foundation" /></p>
+            <h2><T k="app.description" /></h2>
           </div>
           <Link className={styles.primaryButton} href="/projects">
-            Open Projects
+            <T k="projects.open" />
           </Link>
         </header>
         <div className={styles.emptyState}>
-          <h3>Start from Project Management</h3>
+          <h3><T k="projects.startTitle" /></h3>
           <p>
-            Create, open, edit, and delete local projects before adding work
-            items, meetings, risks, issues, or weekly reports.
+            <T k="projects.startBody" />
           </p>
         </div>
       </section>

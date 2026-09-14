@@ -4,20 +4,13 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/db";
 import { meetings, projects, workItems } from "@/db/schema";
+import { LocalizedDateTime, T } from "@/i18n";
 import { DeleteMeetingButton } from "./delete-meeting-button";
 import styles from "../../../page.module.css";
 
-const errorMessages: Record<string, string> = {
-  "delete-failed": "Could not delete the meeting. Please try again.",
+const errorMessageKeys: Record<string, Parameters<typeof T>[0]["k"]> = {
+  "delete-failed": "error.meetingDeleteFailed",
 };
-
-const formatValue = (value: string | null) => value || "-";
-
-const formatDateTime = (value: Date) =>
-  new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 
 const truncate = (value: string | null, maxLength = 120) => {
   if (!value) {
@@ -73,23 +66,23 @@ export default async function MeetingsPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Meetings</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="meetings.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/meetings`}
           >
-            Meetings
+            <T k="nav.meetings" />
           </Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -98,34 +91,34 @@ export default async function MeetingsPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Meetings</h2>
+            <h2><T k="meetings.title" /></h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-              Back to overview
+              <T k="common.backToOverview" />
             </Link>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/meetings/new`}
             >
-              New Meeting
+              <T k="meetings.new" />
             </Link>
           </div>
         </header>
 
-        {error && errorMessages[error] ? (
-          <p className={styles.formError}>{errorMessages[error]}</p>
+        {error && errorMessageKeys[error] ? (
+          <p className={styles.formError}><T k={errorMessageKeys[error]} /></p>
         ) : null}
 
         {meetingList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No meetings yet</h3>
-            <p>Create the first meeting minutes for this project.</p>
+            <h3><T k="meetings.noFoundTitle" /></h3>
+            <p><T k="meetings.noFoundBody" /></p>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/meetings/new`}
             >
-              New Meeting
+              <T k="meetings.new" />
             </Link>
           </div>
         ) : (
@@ -133,13 +126,13 @@ export default async function MeetingsPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Meeting date</th>
-                  <th>Participants</th>
-                  <th>Summary</th>
-                  <th>Action items</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
+                  <th><T k="common.title" /></th>
+                  <th><T k="meetings.meetingDate" /></th>
+                  <th><T k="meetings.participants" /></th>
+                  <th><T k="common.summary" /></th>
+                  <th><T k="meetings.actionItems" /></th>
+                  <th><T k="common.updated" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
@@ -153,24 +146,24 @@ export default async function MeetingsPage({
                         {meeting.title}
                       </Link>
                     </td>
-                    <td>{formatDateTime(meeting.meetingDate)}</td>
+                    <td><LocalizedDateTime value={meeting.meetingDate} /></td>
                     <td>{truncate(meeting.participants, 80)}</td>
                     <td>{truncate(meeting.summary)}</td>
                     <td>{meeting.actionItemCount}</td>
-                    <td>{formatValue(formatDateTime(meeting.updatedAt))}</td>
+                    <td><LocalizedDateTime value={meeting.updatedAt} /></td>
                     <td>
                       <div className={styles.actionRow}>
                         <Link
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/meetings/${meeting.id}`}
                         >
-                          Open
+                          <T k="common.open" />
                         </Link>
                         <Link
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/meetings/${meeting.id}/edit`}
                         >
-                          Edit
+                          <T k="common.edit" />
                         </Link>
                         <DeleteMeetingButton
                           projectId={project.id}

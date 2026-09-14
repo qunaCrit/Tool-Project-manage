@@ -8,6 +8,13 @@ import {
   updateWeeklyReportAction,
 } from "./actions";
 import { reportStatuses, type ReportStatus } from "@/db/schema";
+import {
+  EnumLabel,
+  MessageText,
+  T,
+  type TranslationKey,
+  useTranslation,
+} from "@/i18n";
 import styles from "../../../page.module.css";
 
 type WeeklyReportFormReport = {
@@ -25,40 +32,42 @@ type WeeklyReportFormReport = {
   notes: string | null;
 };
 
-const statusLabels: Record<ReportStatus, string> = {
-  GREEN: "Green",
-  YELLOW: "Yellow",
-  RED: "Red",
-};
-
 const initialState: WeeklyReportFormState = {};
 
-const buildCopyText = (report: WeeklyReportFormReport) => [
-  `Weekly Report: ${report.weekStart} to ${report.weekEnd}`,
-  `Overall Status: ${statusLabels[report.overallStatus]}`,
+const buildCopyText = (
+  report: WeeklyReportFormReport,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string,
+) => [
+  t("weeklyReports.copyHeading", {
+    start: report.weekStart,
+    end: report.weekEnd,
+  }),
+  t("weeklyReports.copyOverallStatus", {
+    status: t(`enum.reportStatus.${report.overallStatus}` as TranslationKey),
+  }),
   "",
-  "Summary",
+  t("common.summary"),
   report.summary || "-",
   "",
-  "Completed Work",
+  t("weeklyReports.completedWork"),
   report.completedWork || "-",
   "",
-  "Ongoing Work",
+  t("weeklyReports.ongoingWork"),
   report.ongoingWork || "-",
   "",
-  "Upcoming Work",
+  t("weeklyReports.upcomingWork"),
   report.upcomingWork || "-",
   "",
-  "Risks",
+  t("nav.risks"),
   report.risks || "-",
   "",
-  "Issues",
+  t("nav.issues"),
   report.issues || "-",
   "",
-  "Decisions",
+  t("meetings.decisions"),
   report.decisions || "-",
   "",
-  "Notes / Support Needed",
+  t("weeklyReports.notesSupport"),
   report.notes || "-",
 ].join("\n");
 
@@ -73,7 +82,8 @@ export function WeeklyReportForm({
     ? updateWeeklyReportAction.bind(null, projectId, report.id)
     : createWeeklyReportAction.bind(null, projectId);
   const [state, formAction, isPending] = useActionState(action, initialState);
-  const copyText = buildCopyText(report);
+  const { t } = useTranslation();
+  const copyText = buildCopyText(report, t);
   const copyCurrentReport = () => {
     const form = document.getElementById("weekly-report-form");
 
@@ -98,17 +108,19 @@ export function WeeklyReportForm({
       notes: String(formData.get("notes") ?? ""),
     };
 
-    navigator.clipboard.writeText(buildCopyText(currentReport));
+    navigator.clipboard.writeText(buildCopyText(currentReport, t));
   };
 
   return (
     <div className={styles.reportLayout}>
       <form action={formAction} className={styles.form} id="weekly-report-form">
-        {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+        {state.error ? (
+          <p className={styles.formError}><MessageText value={state.error} /></p>
+        ) : null}
 
         <div className={styles.formGrid}>
           <label className={styles.field}>
-            <span>Week start</span>
+            <span><T k="weeklyReports.weekStart" /></span>
             <input
               name="weekStart"
               type="date"
@@ -116,12 +128,12 @@ export function WeeklyReportForm({
               aria-invalid={Boolean(state.fieldErrors?.weekStart)}
             />
             {state.fieldErrors?.weekStart ? (
-              <small>{state.fieldErrors.weekStart}</small>
+              <small><MessageText value={state.fieldErrors.weekStart} /></small>
             ) : null}
           </label>
 
           <label className={styles.field}>
-            <span>Week end</span>
+            <span><T k="weeklyReports.weekEnd" /></span>
             <input
               name="weekEnd"
               type="date"
@@ -129,13 +141,13 @@ export function WeeklyReportForm({
               aria-invalid={Boolean(state.fieldErrors?.weekEnd)}
             />
             {state.fieldErrors?.weekEnd ? (
-              <small>{state.fieldErrors.weekEnd}</small>
+              <small><MessageText value={state.fieldErrors.weekEnd} /></small>
             ) : null}
           </label>
         </div>
 
         <label className={styles.field}>
-          <span>Overall status</span>
+          <span><T k="weeklyReports.overallStatus" /></span>
           <select
             name="overallStatus"
             defaultValue={report.overallStatus}
@@ -143,22 +155,22 @@ export function WeeklyReportForm({
           >
             {reportStatuses.map((status) => (
               <option key={status} value={status}>
-                {statusLabels[status]}
+                <EnumLabel group="reportStatus" value={status} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.overallStatus ? (
-            <small>{state.fieldErrors.overallStatus}</small>
+            <small><MessageText value={state.fieldErrors.overallStatus} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Summary</span>
+          <span><T k="common.summary" /></span>
           <textarea name="summary" rows={4} defaultValue={report.summary ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Completed Work</span>
+          <span><T k="weeklyReports.completedWork" /></span>
           <textarea
             name="completedWork"
             rows={5}
@@ -167,7 +179,7 @@ export function WeeklyReportForm({
         </label>
 
         <label className={styles.field}>
-          <span>Ongoing Work</span>
+          <span><T k="weeklyReports.ongoingWork" /></span>
           <textarea
             name="ongoingWork"
             rows={5}
@@ -176,7 +188,7 @@ export function WeeklyReportForm({
         </label>
 
         <label className={styles.field}>
-          <span>Upcoming Work</span>
+          <span><T k="weeklyReports.upcomingWork" /></span>
           <textarea
             name="upcomingWork"
             rows={5}
@@ -185,17 +197,17 @@ export function WeeklyReportForm({
         </label>
 
         <label className={styles.field}>
-          <span>Risks</span>
+          <span><T k="nav.risks" /></span>
           <textarea name="risks" rows={5} defaultValue={report.risks ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Issues</span>
+          <span><T k="nav.issues" /></span>
           <textarea name="issues" rows={5} defaultValue={report.issues ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Decisions</span>
+          <span><T k="meetings.decisions" /></span>
           <textarea
             name="decisions"
             rows={5}
@@ -204,28 +216,28 @@ export function WeeklyReportForm({
         </label>
 
         <label className={styles.field}>
-          <span>Notes / Support Needed</span>
+          <span><T k="weeklyReports.notesSupport" /></span>
           <textarea name="notes" rows={5} defaultValue={report.notes ?? ""} />
         </label>
 
         <button className={styles.primaryButton} type="submit" disabled={isPending}>
           {isPending
-            ? "Saving..."
+            ? <T k="common.saving" />
             : report.id
-              ? "Save Report"
-              : "Save Snapshot"}
+              ? <T k="weeklyReports.saveReport" />
+              : <T k="weeklyReports.saveSnapshot" />}
         </button>
       </form>
 
       <section className={styles.copyPanel}>
         <div className={styles.panelHeader}>
-          <h3>Copyable Output</h3>
+          <h3><T k="weeklyReports.copyableOutput" /></h3>
           <button
             className={styles.secondaryButton}
             type="button"
             onClick={copyCurrentReport}
           >
-            Copy Report
+            <T k="weeklyReports.copyReport" />
           </button>
         </div>
         <pre>{copyText}</pre>

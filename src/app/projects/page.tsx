@@ -10,29 +10,13 @@ import {
   projectStatuses,
   type ProjectStatus,
 } from "@/db/schema";
+import { EnumLabel, LocalizedDate, T } from "@/i18n";
 import { DeleteProjectButton } from "./delete-project-button";
 import styles from "../page.module.css";
 
-const statusLabels: Record<ProjectStatus, string> = {
-  PLANNING: "Planning",
-  ACTIVE: "Active",
-  ON_HOLD: "On hold",
-  COMPLETED: "Completed",
-};
-
-const errorMessages: Record<string, string> = {
-  "invalid-delete": "Project delete request was invalid.",
-  "delete-failed": "Could not delete the project. Please try again.",
-};
-
-const formatDate = (value: string | null) => {
-  if (!value) {
-    return "-";
-  }
-
-  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(
-    new Date(`${value}T00:00:00`),
-  );
+const errorMessageKeys: Record<string, Parameters<typeof T>[0]["k"]> = {
+  "invalid-delete": "error.invalidDelete",
+  "delete-failed": "error.projectDeleteFailed",
 };
 
 export default async function ProjectsPage({
@@ -101,55 +85,55 @@ export default async function ProjectsPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Projects</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="projects.title" /></h1>
         </div>
         <nav className={styles.nav}>
           <Link className={styles.activeNavItem} href="/projects">
-            Projects
+            <T k="nav.projects" />
           </Link>
-          <span>Project Overview</span>
-          <span>Work Items</span>
-          <span>Meetings</span>
-          <span>Risks</span>
-          <span>Issues</span>
-          <span>Weekly Reports</span>
+          <span><T k="nav.overview" /></span>
+          <span><T k="nav.workItems" /></span>
+          <span><T k="nav.meetings" /></span>
+          <span><T k="nav.risks" /></span>
+          <span><T k="nav.issues" /></span>
+          <span><T k="nav.weeklyReports" /></span>
         </nav>
       </aside>
 
       <section className={styles.content}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Project List</p>
-            <h2>Manage local projects</h2>
+            <p className={styles.eyebrow}><T k="projects.list" /></p>
+            <h2><T k="projects.manage" /></h2>
           </div>
           <Link className={styles.primaryButton} href="/projects/new">
-            Create Project
+            <T k="projects.create" />
           </Link>
         </header>
 
-        {error && errorMessages[error] ? (
-          <p className={styles.formError}>{errorMessages[error]}</p>
+        {error && errorMessageKeys[error] ? (
+          <p className={styles.formError}><T k={errorMessageKeys[error]} /></p>
         ) : null}
 
         <form className={styles.filterBar}>
           <label className={styles.field}>
-            <span>Search</span>
+            <span><T k="common.search" /></span>
             <input
               name="q"
               type="search"
               defaultValue={searchQuery}
-              placeholder="Project name"
+              placeholder=""
             />
           </label>
 
           <label className={styles.field}>
-            <span>Status</span>
+            <span><T k="common.status" /></span>
             <select name="status" defaultValue={selectedStatus}>
-              <option value="">All statuses</option>
+              <option value=""><T k="projects.allStatuses" /></option>
               {projectStatuses.map((projectStatus) => (
                 <option key={projectStatus} value={projectStatus}>
-                  {statusLabels[projectStatus]}
+                  <EnumLabel group="projectStatus" value={projectStatus} />
                 </option>
               ))}
             </select>
@@ -157,20 +141,20 @@ export default async function ProjectsPage({
 
           <div className={styles.filterActions}>
             <button className={styles.primaryButton} type="submit">
-              Apply filters
+              <T k="common.applyFilters" />
             </button>
             <Link className={styles.secondaryButton} href="/projects">
-              Reset
+              <T k="common.reset" />
             </Link>
           </div>
         </form>
 
         {projectList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No projects found</h3>
-            <p>Create a project or adjust the current filters.</p>
+            <h3><T k="projects.noFoundTitle" /></h3>
+            <p><T k="projects.noFoundBody" /></p>
             <Link className={styles.primaryButton} href="/projects/new">
-              Create Project
+              <T k="projects.create" />
             </Link>
           </div>
         ) : (
@@ -178,13 +162,13 @@ export default async function ProjectsPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Status</th>
-                  <th>Owner</th>
-                  <th>End date</th>
-                  <th>Open work items</th>
-                  <th>Open risks/issues</th>
-                  <th>Actions</th>
+                  <th><T k="common.name" /></th>
+                  <th><T k="common.status" /></th>
+                  <th><T k="common.owner" /></th>
+                  <th><T k="projects.endDate" /></th>
+                  <th><T k="projects.openWorkItems" /></th>
+                  <th><T k="projects.openRisksIssues" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
@@ -197,23 +181,23 @@ export default async function ProjectsPage({
                     </td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[project.status]}
+                        <EnumLabel group="projectStatus" value={project.status} />
                       </span>
                     </td>
                     <td>{project.owner || "-"}</td>
-                    <td>{formatDate(project.endDate)}</td>
+                    <td><LocalizedDate value={project.endDate} /></td>
                     <td>{openWorkItemCounts.get(project.id) ?? 0}</td>
                     <td>{openRiskIssueCounts.get(project.id) ?? 0}</td>
                     <td>
                       <div className={styles.actionRow}>
                         <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-                          Open
+                          <T k="common.open" />
                         </Link>
                         <Link
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/edit`}
                         >
-                          Edit
+                          <T k="common.edit" />
                         </Link>
                         <DeleteProjectButton
                           projectId={project.id}

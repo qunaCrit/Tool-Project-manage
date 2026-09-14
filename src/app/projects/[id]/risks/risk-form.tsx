@@ -15,6 +15,7 @@ import {
   type RiskSeverity,
   type RiskStatus,
 } from "@/db/schema";
+import { EnumLabel, MessageText, T, useTranslation } from "@/i18n";
 import styles from "../../../page.module.css";
 
 type RiskFormRisk = {
@@ -28,25 +29,6 @@ type RiskFormRisk = {
   owner: string | null;
   status: RiskStatus;
   dueDate: string | null;
-};
-
-const levelLabels: Record<RiskLevel, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-const severityLabels: Record<RiskSeverity, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-const statusLabels: Record<RiskStatus, string> = {
-  OPEN: "Open",
-  MONITORING: "Monitoring",
-  MITIGATED: "Mitigated",
-  CLOSED: "Closed",
 };
 
 const initialState: RiskFormState = {};
@@ -70,13 +52,16 @@ export function RiskForm({
     () => calculateRiskSeverity(probability, impact),
     [impact, probability],
   );
+  const { t } = useTranslation();
 
   return (
     <form action={formAction} className={styles.form}>
-      {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+      {state.error ? (
+        <p className={styles.formError}><MessageText value={state.error} /></p>
+      ) : null}
 
       <label className={styles.field}>
-        <span>Title</span>
+        <span><T k="common.title" /></span>
         <input
           name="title"
           type="text"
@@ -84,12 +69,12 @@ export function RiskForm({
           aria-invalid={Boolean(state.fieldErrors?.title)}
         />
         {state.fieldErrors?.title ? (
-          <small>{state.fieldErrors.title}</small>
+          <small><MessageText value={state.fieldErrors.title} /></small>
         ) : null}
       </label>
 
       <label className={styles.field}>
-        <span>Description</span>
+        <span><T k="projects.description" /></span>
         <textarea
           name="description"
           rows={4}
@@ -99,7 +84,7 @@ export function RiskForm({
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Probability</span>
+          <span><T k="risks.probability" /></span>
           <select
             name="probability"
             value={probability}
@@ -108,17 +93,17 @@ export function RiskForm({
           >
             {riskLevels.map((level) => (
               <option key={level} value={level}>
-                {levelLabels[level]}
+                <EnumLabel group="riskLevel" value={level} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.probability ? (
-            <small>{state.fieldErrors.probability}</small>
+            <small><MessageText value={state.fieldErrors.probability} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Impact</span>
+          <span><T k="risks.impact" /></span>
           <select
             name="impact"
             value={impact}
@@ -127,24 +112,28 @@ export function RiskForm({
           >
             {riskLevels.map((level) => (
               <option key={level} value={level}>
-                {levelLabels[level]}
+                <EnumLabel group="riskLevel" value={level} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.impact ? (
-            <small>{state.fieldErrors.impact}</small>
+            <small><MessageText value={state.fieldErrors.impact} /></small>
           ) : null}
         </label>
       </div>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Severity</span>
-          <input readOnly type="text" value={severityLabels[severity]} />
+          <span><T k="risks.severity" /></span>
+          <input
+            readOnly
+            type="text"
+            value={t(`enum.riskSeverity.${severity}`)}
+          />
         </label>
 
         <label className={styles.field}>
-          <span>Status</span>
+          <span><T k="common.status" /></span>
           <select
             name="status"
             defaultValue={risk?.status ?? "OPEN"}
@@ -152,24 +141,24 @@ export function RiskForm({
           >
             {riskStatuses.map((status) => (
               <option key={status} value={status}>
-                {statusLabels[status]}
+                <EnumLabel group="riskStatus" value={status} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.status ? (
-            <small>{state.fieldErrors.status}</small>
+            <small><MessageText value={state.fieldErrors.status} /></small>
           ) : null}
         </label>
       </div>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Owner</span>
+          <span><T k="common.owner" /></span>
           <input name="owner" type="text" defaultValue={risk?.owner ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Due date</span>
+          <span><T k="common.due" /></span>
           <input
             name="dueDate"
             type="date"
@@ -177,13 +166,13 @@ export function RiskForm({
             aria-invalid={Boolean(state.fieldErrors?.dueDate)}
           />
           {state.fieldErrors?.dueDate ? (
-            <small>{state.fieldErrors.dueDate}</small>
+            <small><MessageText value={state.fieldErrors.dueDate} /></small>
           ) : null}
         </label>
       </div>
 
       <label className={styles.field}>
-        <span>Mitigation</span>
+        <span><T k="risks.mitigation" /></span>
         <textarea
           name="mitigation"
           rows={4}
@@ -192,7 +181,13 @@ export function RiskForm({
       </label>
 
       <button className={styles.primaryButton} type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : risk ? "Save Risk" : "Create Risk"}
+        {isPending ? (
+          <T k="common.saving" />
+        ) : risk ? (
+          <T k="risks.save" />
+        ) : (
+          <T k="risks.create" />
+        )}
       </button>
     </form>
   );

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/db";
 import { projects } from "@/db/schema";
+import { T } from "@/i18n";
 import { ProjectForm } from "../../project-form";
 import styles from "../../../page.module.css";
 
@@ -33,31 +34,31 @@ export default async function EditProjectPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Projects</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="projects.title" /></h1>
         </div>
         <nav className={styles.nav}>
           <Link className={styles.activeNavItem} href="/projects">
-            Projects
+            <T k="nav.projects" />
           </Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
       <section className={styles.content}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Edit Project</p>
+            <p className={styles.eyebrow}><T k="projects.edit" /></p>
             <h2>{project.name}</h2>
           </div>
           <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-            Back to overview
+            <T k="common.backToOverview" />
           </Link>
         </header>
         <ProjectForm project={project} />

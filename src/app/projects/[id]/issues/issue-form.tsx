@@ -13,6 +13,7 @@ import {
   type IssueStatus,
   type Priority,
 } from "@/db/schema";
+import { EnumLabel, MessageText, T } from "@/i18n";
 import styles from "../../../page.module.css";
 
 type IssueFormIssue = {
@@ -26,20 +27,6 @@ type IssueFormIssue = {
   resolution: string | null;
   dueDate: string | null;
   detectedAt: string | null;
-};
-
-const priorityLabels: Record<Priority, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  CRITICAL: "Critical",
-};
-
-const statusLabels: Record<IssueStatus, string> = {
-  OPEN: "Open",
-  IN_PROGRESS: "In progress",
-  RESOLVED: "Resolved",
-  CLOSED: "Closed",
 };
 
 const initialState: IssueFormState = {};
@@ -58,10 +45,12 @@ export function IssueForm({
 
   return (
     <form action={formAction} className={styles.form}>
-      {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+      {state.error ? (
+        <p className={styles.formError}><MessageText value={state.error} /></p>
+      ) : null}
 
       <label className={styles.field}>
-        <span>Title</span>
+        <span><T k="common.title" /></span>
         <input
           name="title"
           type="text"
@@ -69,12 +58,12 @@ export function IssueForm({
           aria-invalid={Boolean(state.fieldErrors?.title)}
         />
         {state.fieldErrors?.title ? (
-          <small>{state.fieldErrors.title}</small>
+          <small><MessageText value={state.fieldErrors.title} /></small>
         ) : null}
       </label>
 
       <label className={styles.field}>
-        <span>Description</span>
+        <span><T k="projects.description" /></span>
         <textarea
           name="description"
           rows={4}
@@ -84,7 +73,7 @@ export function IssueForm({
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Priority</span>
+          <span><T k="common.priority" /></span>
           <select
             name="priority"
             defaultValue={issue?.priority ?? "MEDIUM"}
@@ -92,17 +81,17 @@ export function IssueForm({
           >
             {priorities.map((priority) => (
               <option key={priority} value={priority}>
-                {priorityLabels[priority]}
+                <EnumLabel group="priority" value={priority} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.priority ? (
-            <small>{state.fieldErrors.priority}</small>
+            <small><MessageText value={state.fieldErrors.priority} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Status</span>
+          <span><T k="common.status" /></span>
           <select
             name="status"
             defaultValue={issue?.status ?? "OPEN"}
@@ -110,24 +99,24 @@ export function IssueForm({
           >
             {issueStatuses.map((status) => (
               <option key={status} value={status}>
-                {statusLabels[status]}
+                <EnumLabel group="issueStatus" value={status} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.status ? (
-            <small>{state.fieldErrors.status}</small>
+            <small><MessageText value={state.fieldErrors.status} /></small>
           ) : null}
         </label>
       </div>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Owner</span>
+          <span><T k="common.owner" /></span>
           <input name="owner" type="text" defaultValue={issue?.owner ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Due date</span>
+          <span><T k="common.due" /></span>
           <input
             name="dueDate"
             type="date"
@@ -135,13 +124,13 @@ export function IssueForm({
             aria-invalid={Boolean(state.fieldErrors?.dueDate)}
           />
           {state.fieldErrors?.dueDate ? (
-            <small>{state.fieldErrors.dueDate}</small>
+            <small><MessageText value={state.fieldErrors.dueDate} /></small>
           ) : null}
         </label>
       </div>
 
       <label className={styles.field}>
-        <span>Detected at</span>
+        <span><T k="issues.detectedAt" /></span>
         <input
           name="detectedAt"
           type="date"
@@ -149,17 +138,17 @@ export function IssueForm({
           aria-invalid={Boolean(state.fieldErrors?.detectedAt)}
         />
         {state.fieldErrors?.detectedAt ? (
-          <small>{state.fieldErrors.detectedAt}</small>
+          <small><MessageText value={state.fieldErrors.detectedAt} /></small>
         ) : null}
       </label>
 
       <label className={styles.field}>
-        <span>Impact</span>
+        <span><T k="issues.impact" /></span>
         <textarea name="impact" rows={3} defaultValue={issue?.impact ?? ""} />
       </label>
 
       <label className={styles.field}>
-        <span>Resolution</span>
+        <span><T k="issues.resolution" /></span>
         <textarea
           name="resolution"
           rows={4}
@@ -168,7 +157,13 @@ export function IssueForm({
       </label>
 
       <button className={styles.primaryButton} type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : issue ? "Save Issue" : "Create Issue"}
+        {isPending ? (
+          <T k="common.saving" />
+        ) : issue ? (
+          <T k="issues.save" />
+        ) : (
+          <T k="issues.create" />
+        )}
       </button>
     </form>
   );

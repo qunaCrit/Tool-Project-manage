@@ -6,21 +6,9 @@ import { db } from "@/db";
 import {
   projects,
   weeklyReports,
-  type ReportStatus,
 } from "@/db/schema";
+import { EnumLabel, LocalizedDateTime, T } from "@/i18n";
 import styles from "../../../page.module.css";
-
-const statusLabels: Record<ReportStatus, string> = {
-  GREEN: "Green",
-  YELLOW: "Yellow",
-  RED: "Red",
-};
-
-const formatDateTime = (value: Date) =>
-  new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 
 const truncate = (value: string | null, maxLength = 140) => {
   if (!value) {
@@ -62,21 +50,21 @@ export default async function WeeklyReportsPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Weekly Reports</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="weeklyReports.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/weekly-reports`}
           >
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -85,30 +73,30 @@ export default async function WeeklyReportsPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Weekly Reports</h2>
+            <h2><T k="weeklyReports.title" /></h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-              Back to overview
+              <T k="common.backToOverview" />
             </Link>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/weekly-reports/new`}
             >
-              Generate Weekly Report
+              <T k="weeklyReports.generate" />
             </Link>
           </div>
         </header>
 
         {reportList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No weekly reports yet</h3>
-            <p>Generate the first weekly report draft from project data.</p>
+            <h3><T k="weeklyReports.noFoundTitle" /></h3>
+            <p><T k="weeklyReports.noFoundBody" /></p>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/weekly-reports/new`}
             >
-              Generate Weekly Report
+              <T k="weeklyReports.generate" />
             </Link>
           </div>
         ) : (
@@ -116,32 +104,35 @@ export default async function WeeklyReportsPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Week</th>
-                  <th>Overall status</th>
-                  <th>Summary</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
+                  <th><T k="weeklyReports.week" /></th>
+                  <th><T k="weeklyReports.overallStatus" /></th>
+                  <th><T k="common.summary" /></th>
+                  <th><T k="common.updated" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
                 {reportList.map((report) => (
                   <tr key={report.id}>
                     <td>
-                      {report.weekStart} to {report.weekEnd}
+                      {report.weekStart} <T k="common.to" /> {report.weekEnd}
                     </td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[report.overallStatus]}
+                        <EnumLabel
+                          group="reportStatus"
+                          value={report.overallStatus}
+                        />
                       </span>
                     </td>
                     <td>{truncate(report.summary)}</td>
-                    <td>{formatDateTime(report.updatedAt)}</td>
+                    <td><LocalizedDateTime value={report.updatedAt} /></td>
                     <td>
                       <Link
                         className={styles.secondaryButton}
                         href={`/projects/${project.id}/weekly-reports/${report.id}`}
                       >
-                        Open
+                        <T k="common.open" />
                       </Link>
                     </td>
                   </tr>

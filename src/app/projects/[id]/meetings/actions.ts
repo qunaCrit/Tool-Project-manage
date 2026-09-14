@@ -135,18 +135,18 @@ const validateMeetingInput = async (
     typeof rawMeetingDate === "string" ? rawMeetingDate.trim() : "";
 
   if (!title) {
-    fieldErrors.title = "Title is required.";
+    fieldErrors.title = "validation.titleRequired";
   }
 
   if (!meetingDate || !isValidDateTimeInput(meetingDate)) {
-    fieldErrors.meetingDate = "Meeting date must be a valid date and time.";
+    fieldErrors.meetingDate = "validation.meetingDateInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0) {
     return {
       ok: false,
       state: {
-        error: "Please check the meeting information.",
+        error: "validation.meetingCheck",
         fieldErrors,
       },
     };
@@ -156,7 +156,7 @@ const validateMeetingInput = async (
     return {
       ok: false,
       state: {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       },
     };
   }
@@ -199,26 +199,26 @@ const validateActionItemInput = async (
   const dueDate = textOrNull(formData, "dueDate");
 
   if (!title) {
-    fieldErrors.title = "Title is required.";
+    fieldErrors.title = "validation.titleRequired";
   }
 
   if (!priority) {
-    fieldErrors.priority = "Priority is invalid.";
+    fieldErrors.priority = "validation.priorityInvalid";
   }
 
   if (!status) {
-    fieldErrors.status = "Status is invalid.";
+    fieldErrors.status = "validation.statusInvalid";
   }
 
   if (dueDate && !isValidDateInput(dueDate)) {
-    fieldErrors.dueDate = "Due date must be a valid date.";
+    fieldErrors.dueDate = "validation.dueDateInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !priority || !status) {
     return {
       ok: false,
       state: {
-        error: "Please check the action item information.",
+        error: "validation.actionItemCheck",
         fieldErrors,
       },
     };
@@ -230,7 +230,7 @@ const validateActionItemInput = async (
     return {
       ok: false,
       state: {
-        error: "Meeting was not found.",
+        error: "validation.meetingNotFound",
       },
     };
   }
@@ -275,7 +275,7 @@ export async function createMeetingAction(
     createdMeetingId = createdMeeting.id;
   } catch {
     return {
-      error: "Could not create the meeting. Please try again.",
+      error: "validation.meetingCreateFailed",
     };
   }
 
@@ -294,7 +294,7 @@ export async function updateMeetingAction(
 
   if (!existingMeeting) {
     return {
-      error: "Meeting was not found.",
+      error: "validation.meetingNotFound",
     };
   }
 
@@ -313,12 +313,12 @@ export async function updateMeetingAction(
 
     if (!updatedMeeting) {
       return {
-        error: "Meeting was not found.",
+        error: "validation.meetingNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the meeting. Please try again.",
+      error: "validation.meetingUpdateFailed",
     };
   }
 
@@ -380,7 +380,7 @@ export async function createMeetingActionItemAction(
     await db.insert(workItems).values(input.input);
   } catch {
     return {
-      error: "Could not create the action item. Please try again.",
+      error: "validation.actionItemCreateFailed",
     };
   }
 

@@ -78,19 +78,19 @@ const validateProjectInput = (formData: FormData): ProjectValidationResult => {
   const endDate = textOrNull(formData, "endDate");
 
   if (!name) {
-    fieldErrors.name = "Name is required.";
+    fieldErrors.name = "validation.nameRequired";
   }
 
   if (!status) {
-    fieldErrors.status = "Status is invalid.";
+    fieldErrors.status = "validation.statusInvalid";
   }
 
   if (startDate && !isValidDateInput(startDate)) {
-    fieldErrors.startDate = "Start date must be a valid date.";
+    fieldErrors.startDate = "validation.startDateInvalid";
   }
 
   if (endDate && !isValidDateInput(endDate)) {
-    fieldErrors.endDate = "End date must be a valid date.";
+    fieldErrors.endDate = "validation.endDateInvalid";
   }
 
   if (
@@ -100,14 +100,14 @@ const validateProjectInput = (formData: FormData): ProjectValidationResult => {
     isValidDateInput(endDate) &&
     endDate < startDate
   ) {
-    fieldErrors.endDate = "End date cannot be earlier than start date.";
+    fieldErrors.endDate = "validation.endDateBeforeStart";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !status) {
     return {
       ok: false,
       state: {
-        error: "Please check the project information.",
+        error: "validation.projectCheck",
         fieldErrors,
       },
     };
@@ -152,7 +152,7 @@ export async function createProjectAction(
     createdProjectId = createdProject.id;
   } catch {
     return {
-      error: "Could not create the project. Please try again.",
+      error: "validation.projectCreateFailed",
     };
   }
 
@@ -180,12 +180,12 @@ export async function updateProjectAction(
 
     if (!updatedProject) {
       return {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the project. Please try again.",
+      error: "validation.projectUpdateFailed",
     };
   }
 

@@ -8,24 +8,11 @@ import {
   risks,
   riskSeverities,
   riskStatuses,
-  type RiskLevel,
   type RiskSeverity,
-  type RiskStatus,
 } from "@/db/schema";
+import { EnumLabel, T } from "@/i18n";
 import { DeleteRiskButton } from "./delete-risk-button";
 import styles from "../../../page.module.css";
-
-const levelLabels: Record<RiskLevel, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-const severityLabels: Record<RiskSeverity, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
 
 const severityClasses: Record<RiskSeverity, string> = {
   LOW: styles.severityLOW,
@@ -33,15 +20,8 @@ const severityClasses: Record<RiskSeverity, string> = {
   HIGH: styles.severityHIGH,
 };
 
-const statusLabels: Record<RiskStatus, string> = {
-  OPEN: "Open",
-  MONITORING: "Monitoring",
-  MITIGATED: "Mitigated",
-  CLOSED: "Closed",
-};
-
-const errorMessages: Record<string, string> = {
-  "delete-failed": "Could not delete the risk. Please try again.",
+const errorMessageKeys: Record<string, Parameters<typeof T>[0]["k"]> = {
+  "delete-failed": "error.riskDeleteFailed",
 };
 
 const formatValue = (value: string | null) => value || "-";
@@ -110,23 +90,23 @@ export default async function RisksPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Risks</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="risks.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
+          <Link href={`/projects/${project.id}/work-items`}><T k="nav.workItems" /></Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/risks`}
           >
-            Risks
+            <T k="nav.risks" />
           </Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -135,77 +115,77 @@ export default async function RisksPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Risks</h2>
+            <h2><T k="risks.title" /></h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-              Back to overview
+              <T k="common.backToOverview" />
             </Link>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/risks/new`}
             >
-              Add Risk
+              <T k="risks.add" />
             </Link>
           </div>
         </header>
 
-        {error && errorMessages[error] ? (
-          <p className={styles.formError}>{errorMessages[error]}</p>
+        {error && errorMessageKeys[error] ? (
+          <p className={styles.formError}><T k={errorMessageKeys[error]} /></p>
         ) : null}
 
         <form className={styles.filterBar}>
           <label className={styles.field}>
-            <span>Status</span>
+            <span><T k="common.status" /></span>
             <select name="status" defaultValue={selectedStatus ?? ""}>
-              <option value="">All statuses</option>
+              <option value=""><T k="projects.allStatuses" /></option>
               {riskStatuses.map((riskStatus) => (
                 <option key={riskStatus} value={riskStatus}>
-                  {statusLabels[riskStatus]}
+                  <EnumLabel group="riskStatus" value={riskStatus} />
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Severity</span>
+            <span><T k="risks.severity" /></span>
             <select name="severity" defaultValue={selectedSeverity ?? ""}>
-              <option value="">All severities</option>
+              <option value=""><T k="risks.allSeverities" /></option>
               {riskSeverities.map((riskSeverity) => (
                 <option key={riskSeverity} value={riskSeverity}>
-                  {severityLabels[riskSeverity]}
+                  <EnumLabel group="riskSeverity" value={riskSeverity} />
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Owner</span>
+            <span><T k="common.owner" /></span>
             <input name="owner" type="text" defaultValue={selectedOwner} />
           </label>
 
           <div className={styles.filterActions}>
             <button className={styles.primaryButton} type="submit">
-              Apply filters
+              <T k="common.applyFilters" />
             </button>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/risks`}
             >
-              Reset
+              <T k="common.reset" />
             </Link>
           </div>
         </form>
 
         {riskList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No risks found</h3>
-            <p>Add the first risk for this project.</p>
+            <h3><T k="risks.noFoundTitle" /></h3>
+            <p><T k="risks.noFoundBody" /></p>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/risks/new`}
             >
-              Add Risk
+              <T k="risks.add" />
             </Link>
           </div>
         ) : (
@@ -213,14 +193,14 @@ export default async function RisksPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Probability</th>
-                  <th>Impact</th>
-                  <th>Severity</th>
-                  <th>Owner</th>
-                  <th>Status</th>
-                  <th>Due date</th>
-                  <th>Actions</th>
+                  <th><T k="common.title" /></th>
+                  <th><T k="risks.probability" /></th>
+                  <th><T k="risks.impact" /></th>
+                  <th><T k="risks.severity" /></th>
+                  <th><T k="common.owner" /></th>
+                  <th><T k="common.status" /></th>
+                  <th><T k="common.due" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
@@ -239,21 +219,21 @@ export default async function RisksPage({
                         {risk.title}
                       </Link>
                     </td>
-                    <td>{levelLabels[risk.probability]}</td>
-                    <td>{levelLabels[risk.impact]}</td>
+                    <td><EnumLabel group="riskLevel" value={risk.probability} /></td>
+                    <td><EnumLabel group="riskLevel" value={risk.impact} /></td>
                     <td>
                       <span
                         className={`${styles.severityPill} ${
                           severityClasses[risk.severity]
                         }`}
                       >
-                        {severityLabels[risk.severity]}
+                        <EnumLabel group="riskSeverity" value={risk.severity} />
                       </span>
                     </td>
                     <td>{formatValue(risk.owner)}</td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[risk.status]}
+                        <EnumLabel group="riskStatus" value={risk.status} />
                       </span>
                     </td>
                     <td>{formatValue(risk.dueDate)}</td>
@@ -263,7 +243,7 @@ export default async function RisksPage({
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/risks/${risk.id}/edit`}
                         >
-                          Edit
+                          <T k="common.edit" />
                         </Link>
                         <DeleteRiskButton
                           projectId={project.id}

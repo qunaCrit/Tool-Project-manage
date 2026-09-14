@@ -108,30 +108,30 @@ const validateIssueInput = async (
   const detectedAt = textOrNull(formData, "detectedAt");
 
   if (!title) {
-    fieldErrors.title = "Title is required.";
+    fieldErrors.title = "validation.titleRequired";
   }
 
   if (!priority) {
-    fieldErrors.priority = "Priority is invalid.";
+    fieldErrors.priority = "validation.priorityInvalid";
   }
 
   if (!status) {
-    fieldErrors.status = "Status is invalid.";
+    fieldErrors.status = "validation.statusInvalid";
   }
 
   if (dueDate && !isValidDateInput(dueDate)) {
-    fieldErrors.dueDate = "Due date must be a valid date.";
+    fieldErrors.dueDate = "validation.dueDateInvalid";
   }
 
   if (detectedAt && !isValidDateInput(detectedAt)) {
-    fieldErrors.detectedAt = "Detected date must be a valid date.";
+    fieldErrors.detectedAt = "validation.detectedDateInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !priority || !status) {
     return {
       ok: false,
       state: {
-        error: "Please check the issue information.",
+        error: "validation.issueCheck",
         fieldErrors,
       },
     };
@@ -141,7 +141,7 @@ const validateIssueInput = async (
     return {
       ok: false,
       state: {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       },
     };
   }
@@ -182,7 +182,7 @@ export async function createIssueAction(
     await db.insert(issues).values(input.input);
   } catch {
     return {
-      error: "Could not create the issue. Please try again.",
+      error: "validation.issueCreateFailed",
     };
   }
 
@@ -205,7 +205,7 @@ export async function updateIssueAction(
 
   if (!existingIssue) {
     return {
-      error: "Issue was not found.",
+      error: "validation.issueNotFound",
     };
   }
 
@@ -228,12 +228,12 @@ export async function updateIssueAction(
 
     if (!updatedIssue) {
       return {
-        error: "Issue was not found.",
+        error: "validation.issueNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the issue. Please try again.",
+      error: "validation.issueUpdateFailed",
     };
   }
 

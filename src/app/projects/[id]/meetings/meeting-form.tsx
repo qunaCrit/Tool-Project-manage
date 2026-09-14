@@ -7,6 +7,7 @@ import {
   type MeetingFormState,
   updateMeetingAction,
 } from "./actions";
+import { MessageText, T } from "@/i18n";
 import styles from "../../../page.module.css";
 
 type MeetingFormItem = {
@@ -41,10 +42,12 @@ export function MeetingForm({
 
   return (
     <form action={formAction} className={styles.form}>
-      {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+      {state.error ? (
+        <p className={styles.formError}><MessageText value={state.error} /></p>
+      ) : null}
 
       <label className={styles.field}>
-        <span>Title</span>
+        <span><T k="common.title" /></span>
         <input
           name="title"
           type="text"
@@ -52,13 +55,13 @@ export function MeetingForm({
           aria-invalid={Boolean(state.fieldErrors?.title)}
         />
         {state.fieldErrors?.title ? (
-          <small>{state.fieldErrors.title}</small>
+          <small><MessageText value={state.fieldErrors.title} /></small>
         ) : null}
       </label>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Meeting date</span>
+          <span><T k="meetings.meetingDate" /></span>
           <input
             name="meetingDate"
             type="datetime-local"
@@ -68,12 +71,12 @@ export function MeetingForm({
             aria-invalid={Boolean(state.fieldErrors?.meetingDate)}
           />
           {state.fieldErrors?.meetingDate ? (
-            <small>{state.fieldErrors.meetingDate}</small>
+            <small><MessageText value={state.fieldErrors.meetingDate} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Participants</span>
+          <span><T k="meetings.participants" /></span>
           <input
             name="participants"
             type="text"
@@ -83,17 +86,17 @@ export function MeetingForm({
       </div>
 
       <label className={styles.field}>
-        <span>Agenda</span>
+        <span><T k="meetings.agenda" /></span>
         <textarea name="agenda" rows={5} defaultValue={meeting?.agenda ?? ""} />
       </label>
 
       <label className={styles.field}>
-        <span>Notes</span>
+        <span><T k="meetings.notes" /></span>
         <textarea name="notes" rows={8} defaultValue={meeting?.notes ?? ""} />
       </label>
 
       <label className={styles.field}>
-        <span>Summary</span>
+        <span><T k="common.summary" /></span>
         <textarea
           name="summary"
           rows={5}
@@ -102,7 +105,7 @@ export function MeetingForm({
       </label>
 
       <label className={styles.field}>
-        <span>Decisions</span>
+        <span><T k="meetings.decisions" /></span>
         <textarea
           name="decisions"
           rows={5}
@@ -111,7 +114,13 @@ export function MeetingForm({
       </label>
 
       <button className={styles.primaryButton} type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : meeting ? "Save Meeting" : "Create Meeting"}
+        {isPending ? (
+          <T k="common.saving" />
+        ) : meeting ? (
+          <T k="meetings.save" />
+        ) : (
+          <T k="meetings.create" />
+        )}
       </button>
     </form>
   );

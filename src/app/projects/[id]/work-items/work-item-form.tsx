@@ -7,6 +7,7 @@ import {
   createWorkItemAction,
   updateWorkItemAction,
 } from "./actions";
+import { EnumLabel, MessageText, T } from "@/i18n";
 import styles from "../../../page.module.css";
 import {
   priorities,
@@ -29,25 +30,6 @@ type WorkItemFormItem = {
   source: string | null;
 };
 
-const typeLabels: Record<WorkItemType, string> = {
-  TASK: "Task",
-  ACTION_ITEM: "Action Item",
-};
-
-const statusLabels: Record<WorkItemStatus, string> = {
-  TODO: "Todo",
-  IN_PROGRESS: "In progress",
-  DONE: "Done",
-  BLOCKED: "Blocked",
-};
-
-const priorityLabels: Record<Priority, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  CRITICAL: "Critical",
-};
-
 const initialState: WorkItemFormState = {};
 
 export function WorkItemForm({
@@ -64,11 +46,13 @@ export function WorkItemForm({
 
   return (
     <form action={formAction} className={styles.form}>
-      {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+      {state.error ? (
+        <p className={styles.formError}><MessageText value={state.error} /></p>
+      ) : null}
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Type</span>
+          <span><T k="common.type" /></span>
           <select
             name="type"
             defaultValue={workItem?.type ?? "TASK"}
@@ -76,17 +60,17 @@ export function WorkItemForm({
           >
             {workItemTypes.map((type) => (
               <option key={type} value={type}>
-                {typeLabels[type]}
+                <EnumLabel group="workItemType" value={type} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.type ? (
-            <small>{state.fieldErrors.type}</small>
+            <small><MessageText value={state.fieldErrors.type} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Status</span>
+          <span><T k="common.status" /></span>
           <select
             name="status"
             defaultValue={workItem?.status ?? "TODO"}
@@ -94,18 +78,18 @@ export function WorkItemForm({
           >
             {workItemStatuses.map((status) => (
               <option key={status} value={status}>
-                {statusLabels[status]}
+                <EnumLabel group="workItemStatus" value={status} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.status ? (
-            <small>{state.fieldErrors.status}</small>
+            <small><MessageText value={state.fieldErrors.status} /></small>
           ) : null}
         </label>
       </div>
 
       <label className={styles.field}>
-        <span>Title</span>
+        <span><T k="common.title" /></span>
         <input
           name="title"
           type="text"
@@ -113,12 +97,12 @@ export function WorkItemForm({
           aria-invalid={Boolean(state.fieldErrors?.title)}
         />
         {state.fieldErrors?.title ? (
-          <small>{state.fieldErrors.title}</small>
+          <small><MessageText value={state.fieldErrors.title} /></small>
         ) : null}
       </label>
 
       <label className={styles.field}>
-        <span>Description</span>
+        <span><T k="projects.description" /></span>
         <textarea
           name="description"
           rows={4}
@@ -128,7 +112,7 @@ export function WorkItemForm({
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Priority</span>
+          <span><T k="common.priority" /></span>
           <select
             name="priority"
             defaultValue={workItem?.priority ?? "MEDIUM"}
@@ -136,17 +120,17 @@ export function WorkItemForm({
           >
             {priorities.map((priority) => (
               <option key={priority} value={priority}>
-                {priorityLabels[priority]}
+                <EnumLabel group="priority" value={priority} />
               </option>
             ))}
           </select>
           {state.fieldErrors?.priority ? (
-            <small>{state.fieldErrors.priority}</small>
+            <small><MessageText value={state.fieldErrors.priority} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>Due date</span>
+          <span><T k="common.due" /></span>
           <input
             name="dueDate"
             type="date"
@@ -154,19 +138,19 @@ export function WorkItemForm({
             aria-invalid={Boolean(state.fieldErrors?.dueDate)}
           />
           {state.fieldErrors?.dueDate ? (
-            <small>{state.fieldErrors.dueDate}</small>
+            <small><MessageText value={state.fieldErrors.dueDate} /></small>
           ) : null}
         </label>
       </div>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Owner</span>
+          <span><T k="common.owner" /></span>
           <input name="owner" type="text" defaultValue={workItem?.owner ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Source</span>
+          <span><T k="workItems.source" /></span>
           <input
             name="source"
             type="text"
@@ -176,11 +160,13 @@ export function WorkItemForm({
       </div>
 
       <button className={styles.primaryButton} type="submit" disabled={isPending}>
-        {isPending
-          ? "Saving..."
-          : workItem
-            ? "Save Work Item"
-            : "Create Work Item"}
+        {isPending ? (
+          <T k="common.saving" />
+        ) : workItem ? (
+          <T k="workItems.save" />
+        ) : (
+          <T k="workItems.create" />
+        )}
       </button>
     </form>
   );

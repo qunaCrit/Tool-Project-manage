@@ -9,34 +9,13 @@ import {
   workItems,
   workItemStatuses,
   workItemTypes,
-  type Priority,
-  type WorkItemStatus,
-  type WorkItemType,
 } from "@/db/schema";
+import { EnumLabel, T } from "@/i18n";
 import { DeleteWorkItemButton } from "./delete-work-item-button";
 import styles from "../../../page.module.css";
 
-const typeLabels: Record<WorkItemType, string> = {
-  TASK: "Task",
-  ACTION_ITEM: "Action Item",
-};
-
-const statusLabels: Record<WorkItemStatus, string> = {
-  TODO: "Todo",
-  IN_PROGRESS: "In progress",
-  DONE: "Done",
-  BLOCKED: "Blocked",
-};
-
-const priorityLabels: Record<Priority, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  CRITICAL: "Critical",
-};
-
-const errorMessages: Record<string, string> = {
-  "delete-failed": "Could not delete the work item. Please try again.",
+const errorMessageKeys: Record<string, Parameters<typeof T>[0]["k"]> = {
+  "delete-failed": "error.workItemDeleteFailed",
 };
 
 const formatValue = (value: string | null) => value || "-";
@@ -107,23 +86,23 @@ export default async function WorkItemsPage({
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
-          <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Work Items</h1>
+          <p className={styles.eyebrow}><T k="app.eyebrow" /></p>
+          <h1><T k="workItems.title" /></h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
-          <Link href={`/projects/${project.id}`}>Project Overview</Link>
+          <Link href="/projects"><T k="nav.projects" /></Link>
+          <Link href={`/projects/${project.id}`}><T k="nav.overview" /></Link>
           <Link
             className={styles.activeNavItem}
             href={`/projects/${project.id}/work-items`}
           >
-            Work Items
+            <T k="nav.workItems" />
           </Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/meetings`}><T k="nav.meetings" /></Link>
+          <Link href={`/projects/${project.id}/risks`}><T k="nav.risks" /></Link>
+          <Link href={`/projects/${project.id}/issues`}><T k="nav.issues" /></Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
-            Weekly Reports
+            <T k="nav.weeklyReports" />
           </Link>
         </nav>
       </aside>
@@ -132,57 +111,57 @@ export default async function WorkItemsPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Work Items</h2>
+            <h2><T k="workItems.title" /></h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
-              Back to overview
+              <T k="common.backToOverview" />
             </Link>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/work-items/new`}
             >
-              Add Work Item
+              <T k="workItems.add" />
             </Link>
           </div>
         </header>
 
-        {error && errorMessages[error] ? (
-          <p className={styles.formError}>{errorMessages[error]}</p>
+        {error && errorMessageKeys[error] ? (
+          <p className={styles.formError}><T k={errorMessageKeys[error]} /></p>
         ) : null}
 
         <form className={styles.filterBar}>
           <label className={styles.field}>
-            <span>Type</span>
+            <span><T k="common.type" /></span>
             <select name="type" defaultValue={selectedType ?? ""}>
-              <option value="">All types</option>
+              <option value=""><T k="workItems.allTypes" /></option>
               {workItemTypes.map((itemType) => (
                 <option key={itemType} value={itemType}>
-                  {typeLabels[itemType]}
+                  <EnumLabel group="workItemType" value={itemType} />
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Status</span>
+            <span><T k="common.status" /></span>
             <select name="status" defaultValue={selectedStatus ?? ""}>
-              <option value="">All statuses</option>
+              <option value=""><T k="projects.allStatuses" /></option>
               {workItemStatuses.map((itemStatus) => (
                 <option key={itemStatus} value={itemStatus}>
-                  {statusLabels[itemStatus]}
+                  <EnumLabel group="workItemStatus" value={itemStatus} />
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Priority</span>
+            <span><T k="common.priority" /></span>
             <select name="priority" defaultValue={selectedPriority ?? ""}>
-              <option value="">All priorities</option>
+              <option value=""><T k="workItems.allPriorities" /></option>
               {priorities.map((itemPriority) => (
                 <option key={itemPriority} value={itemPriority}>
-                  {priorityLabels[itemPriority]}
+                  <EnumLabel group="priority" value={itemPriority} />
                 </option>
               ))}
             </select>
@@ -190,26 +169,26 @@ export default async function WorkItemsPage({
 
           <div className={styles.filterActions}>
             <button className={styles.primaryButton} type="submit">
-              Apply filters
+              <T k="common.applyFilters" />
             </button>
             <Link
               className={styles.secondaryButton}
               href={`/projects/${project.id}/work-items`}
             >
-              Reset
+              <T k="common.reset" />
             </Link>
           </div>
         </form>
 
         {workItemList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No work items found</h3>
-            <p>Add the first task or action item for this project.</p>
+            <h3><T k="workItems.noFoundTitle" /></h3>
+            <p><T k="workItems.noFoundBody" /></p>
             <Link
               className={styles.primaryButton}
               href={`/projects/${project.id}/work-items/new`}
             >
-              Add Work Item
+              <T k="workItems.add" />
             </Link>
           </div>
         ) : (
@@ -217,20 +196,20 @@ export default async function WorkItemsPage({
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Type</th>
-                  <th>Title</th>
-                  <th>Status</th>
-                  <th>Priority</th>
-                  <th>Owner</th>
-                  <th>Due date</th>
-                  <th>Source</th>
-                  <th>Actions</th>
+                  <th><T k="common.type" /></th>
+                  <th><T k="common.title" /></th>
+                  <th><T k="common.status" /></th>
+                  <th><T k="common.priority" /></th>
+                  <th><T k="common.owner" /></th>
+                  <th><T k="common.due" /></th>
+                  <th><T k="workItems.source" /></th>
+                  <th><T k="common.actions" /></th>
                 </tr>
               </thead>
               <tbody>
                 {workItemList.map((workItem) => (
                   <tr key={workItem.id}>
-                    <td>{typeLabels[workItem.type]}</td>
+                    <td><EnumLabel group="workItemType" value={workItem.type} /></td>
                     <td>
                       <Link
                         className={styles.projectLink}
@@ -241,10 +220,10 @@ export default async function WorkItemsPage({
                     </td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[workItem.status]}
+                        <EnumLabel group="workItemStatus" value={workItem.status} />
                       </span>
                     </td>
-                    <td>{priorityLabels[workItem.priority]}</td>
+                    <td><EnumLabel group="priority" value={workItem.priority} /></td>
                     <td>{formatValue(workItem.owner)}</td>
                     <td>{formatValue(workItem.dueDate)}</td>
                     <td>{formatValue(workItem.source)}</td>
@@ -254,7 +233,7 @@ export default async function WorkItemsPage({
                           className={styles.secondaryButton}
                           href={`/projects/${project.id}/work-items/${workItem.id}/edit`}
                         >
-                          Edit
+                          <T k="common.edit" />
                         </Link>
                         <DeleteWorkItemButton
                           projectId={project.id}

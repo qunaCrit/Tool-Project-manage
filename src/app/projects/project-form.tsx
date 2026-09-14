@@ -7,6 +7,7 @@ import {
   createProjectAction,
   updateProjectAction,
 } from "./actions";
+import { EnumLabel, MessageText, T } from "@/i18n";
 import styles from "../page.module.css";
 import { projectStatuses, type ProjectStatus } from "@/db/schema";
 
@@ -23,13 +24,6 @@ type ProjectFormProject = {
   healthNote: string | null;
 };
 
-const statusLabels: Record<ProjectStatus, string> = {
-  PLANNING: "Planning",
-  ACTIVE: "Active",
-  ON_HOLD: "On hold",
-  COMPLETED: "Completed",
-};
-
 const initialState: ProjectFormState = {};
 
 export function ProjectForm({ project }: { project?: ProjectFormProject }) {
@@ -40,10 +34,12 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
 
   return (
     <form action={formAction} className={styles.form}>
-      {state.error ? <p className={styles.formError}>{state.error}</p> : null}
+      {state.error ? (
+        <p className={styles.formError}><MessageText value={state.error} /></p>
+      ) : null}
 
       <label className={styles.field}>
-        <span>Name</span>
+        <span><T k="common.name" /></span>
         <input
           name="name"
           type="text"
@@ -51,12 +47,12 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
           aria-invalid={Boolean(state.fieldErrors?.name)}
         />
         {state.fieldErrors?.name ? (
-          <small>{state.fieldErrors.name}</small>
+          <small><MessageText value={state.fieldErrors.name} /></small>
         ) : null}
       </label>
 
       <label className={styles.field}>
-        <span>Status</span>
+        <span><T k="common.status" /></span>
         <select
           name="status"
           defaultValue={project?.status ?? "PLANNING"}
@@ -64,23 +60,23 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
         >
           {projectStatuses.map((status) => (
             <option key={status} value={status}>
-              {statusLabels[status]}
+              <EnumLabel group="projectStatus" value={status} />
             </option>
           ))}
         </select>
         {state.fieldErrors?.status ? (
-          <small>{state.fieldErrors.status}</small>
+          <small><MessageText value={state.fieldErrors.status} /></small>
         ) : null}
       </label>
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Owner</span>
+          <span><T k="common.owner" /></span>
           <input name="owner" type="text" defaultValue={project?.owner ?? ""} />
         </label>
 
         <label className={styles.field}>
-          <span>Customer</span>
+          <span><T k="projects.customer" /></span>
           <input
             name="customer"
             type="text"
@@ -91,7 +87,7 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
 
       <div className={styles.formGrid}>
         <label className={styles.field}>
-          <span>Start date</span>
+          <span><T k="projects.startDate" /></span>
           <input
             name="startDate"
             type="date"
@@ -99,12 +95,12 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
             aria-invalid={Boolean(state.fieldErrors?.startDate)}
           />
           {state.fieldErrors?.startDate ? (
-            <small>{state.fieldErrors.startDate}</small>
+            <small><MessageText value={state.fieldErrors.startDate} /></small>
           ) : null}
         </label>
 
         <label className={styles.field}>
-          <span>End date</span>
+          <span><T k="projects.endDate" /></span>
           <input
             name="endDate"
             type="date"
@@ -112,13 +108,13 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
             aria-invalid={Boolean(state.fieldErrors?.endDate)}
           />
           {state.fieldErrors?.endDate ? (
-            <small>{state.fieldErrors.endDate}</small>
+            <small><MessageText value={state.fieldErrors.endDate} /></small>
           ) : null}
         </label>
       </div>
 
       <label className={styles.field}>
-        <span>Description</span>
+        <span><T k="projects.description" /></span>
         <textarea
           name="description"
           rows={3}
@@ -127,7 +123,7 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
       </label>
 
       <label className={styles.field}>
-        <span>Objective</span>
+        <span><T k="projects.objective" /></span>
         <textarea
           name="objective"
           rows={3}
@@ -136,7 +132,7 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
       </label>
 
       <label className={styles.field}>
-        <span>Health note</span>
+        <span><T k="projects.healthNote" /></span>
         <textarea
           name="healthNote"
           rows={3}
@@ -145,7 +141,13 @@ export function ProjectForm({ project }: { project?: ProjectFormProject }) {
       </label>
 
       <button className={styles.primaryButton} type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : project ? "Save Project" : "Create Project"}
+        {isPending ? (
+          <T k="common.saving" />
+        ) : project ? (
+          <T k="projects.save" />
+        ) : (
+          <T k="projects.create" />
+        )}
       </button>
     </form>
   );

@@ -101,11 +101,11 @@ const validateWeeklyReportInput = async (
       : null;
 
   if (!weekStart || !isValidDateInput(weekStart)) {
-    fieldErrors.weekStart = "Week start must be a valid date.";
+    fieldErrors.weekStart = "validation.weekStartInvalid";
   }
 
   if (!weekEnd || !isValidDateInput(weekEnd)) {
-    fieldErrors.weekEnd = "Week end must be a valid date.";
+    fieldErrors.weekEnd = "validation.weekEndInvalid";
   }
 
   if (
@@ -115,18 +115,18 @@ const validateWeeklyReportInput = async (
     isValidDateInput(weekEnd) &&
     weekEnd < weekStart
   ) {
-    fieldErrors.weekEnd = "Week end cannot be earlier than week start.";
+    fieldErrors.weekEnd = "validation.weekEndBeforeStart";
   }
 
   if (!overallStatus) {
-    fieldErrors.overallStatus = "Overall status is invalid.";
+    fieldErrors.overallStatus = "validation.overallStatusInvalid";
   }
 
   if (Object.keys(fieldErrors).length > 0 || !overallStatus) {
     return {
       ok: false,
       state: {
-        error: "Please check the weekly report information.",
+        error: "validation.weeklyReportCheck",
         fieldErrors,
       },
     };
@@ -136,7 +136,7 @@ const validateWeeklyReportInput = async (
     return {
       ok: false,
       state: {
-        error: "Project was not found.",
+        error: "validation.projectNotFound",
       },
     };
   }
@@ -182,7 +182,7 @@ export async function createWeeklyReportAction(
     createdReportId = createdReport.id;
   } catch {
     return {
-      error: "Could not save the weekly report. Please try again.",
+      error: "validation.weeklyReportSaveFailed",
     };
   }
 
@@ -207,7 +207,7 @@ export async function updateWeeklyReportAction(
 
   if (!existingReport) {
     return {
-      error: "Weekly report was not found.",
+      error: "validation.weeklyReportNotFound",
     };
   }
 
@@ -228,12 +228,12 @@ export async function updateWeeklyReportAction(
 
     if (!updatedReport) {
       return {
-        error: "Weekly report was not found.",
+        error: "validation.weeklyReportNotFound",
       };
     }
   } catch {
     return {
-      error: "Could not update the weekly report. Please try again.",
+      error: "validation.weeklyReportUpdateFailed",
     };
   }
 
