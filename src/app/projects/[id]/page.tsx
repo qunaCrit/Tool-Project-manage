@@ -68,6 +68,12 @@ export default async function ProjectDetailPage({
             <Link className={styles.secondaryButton} href="/projects">
               Project List
             </Link>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/work-items`}
+            >
+              Work Items
+            </Link>
             <Link className={styles.primaryButton} href={`/projects/${project.id}/edit`}>
               Edit Project
             </Link>
@@ -118,7 +124,7 @@ export default async function ProjectDetailPage({
         </section>
 
         <section className={styles.placeholderGrid}>
-          {["Work Items", "Meetings", "Risks", "Issues", "Weekly Reports"].map(
+          {["Meetings", "Risks", "Issues", "Weekly Reports"].map(
             (moduleName) => (
               <div className={styles.placeholderPanel} key={moduleName}>
                 <h3>{moduleName}</h3>
@@ -126,6 +132,18 @@ export default async function ProjectDetailPage({
               </div>
             ),
           )}
+          <div className={styles.placeholderPanel}>
+            <h3>Work Items</h3>
+            <p>
+              Track project tasks and action items in one clean list.
+            </p>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/work-items`}
+            >
+              View Work Items
+            </Link>
+          </div>
         </section>
       </section>
     </main>

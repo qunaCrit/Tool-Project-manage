@@ -203,6 +203,23 @@
   gap: 8px;
 }
 
+.filterBar {
+  display: grid;
+  align-items: end;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.filterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .form {
   display: flex;
   max-width: 900px;
@@ -337,7 +354,8 @@
   .formGrid,
   .overviewGrid,
   .detailList,
-  .placeholderGrid {
+  .placeholderGrid,
+  .filterBar {
     grid-template-columns: 1fr;
   }
 }
