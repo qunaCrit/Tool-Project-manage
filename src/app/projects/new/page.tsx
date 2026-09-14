@@ -1,17 +1,20 @@
 import Link from "next/link";
 
-import styles from "./page.module.css";
+import { ProjectForm } from "../project-form";
+import styles from "../../page.module.css";
 
-export default function Home() {
+export default function NewProjectPage() {
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Tool Project Manage</h1>
+          <h1>Projects</h1>
         </div>
         <nav className={styles.nav}>
-          <Link href="/projects">Projects</Link>
+          <Link className={styles.activeNavItem} href="/projects">
+            Projects
+          </Link>
           <span>Project Overview</span>
           <span>Work Items</span>
           <span>Meetings</span>
@@ -23,20 +26,14 @@ export default function Home() {
       <section className={styles.content}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>MVP foundation</p>
-            <h2>Project Management Assistant</h2>
+            <p className={styles.eyebrow}>Create Project</p>
+            <h2>New project</h2>
           </div>
-          <Link className={styles.primaryButton} href="/projects">
-            Open Projects
+          <Link className={styles.secondaryButton} href="/projects">
+            Back to list
           </Link>
         </header>
-        <div className={styles.emptyState}>
-          <h3>Start from Project Management</h3>
-          <p>
-            Create, open, edit, and delete local projects before adding work
-            items, meetings, risks, issues, or weekly reports.
-          </p>
-        </div>
+        <ProjectForm />
       </section>
     </main>
   );
