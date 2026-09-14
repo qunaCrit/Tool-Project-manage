@@ -52,7 +52,7 @@ export default async function ProjectDetailPage({
           </Link>
           <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
           <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <span>Risks</span>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <span>Issues</span>
           <span>Weekly Reports</span>
         </nav>
@@ -79,6 +79,12 @@ export default async function ProjectDetailPage({
               href={`/projects/${project.id}/meetings`}
             >
               Meetings
+            </Link>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/risks`}
+            >
+              Risks
             </Link>
             <Link className={styles.primaryButton} href={`/projects/${project.id}/edit`}>
               Edit Project
@@ -130,7 +136,7 @@ export default async function ProjectDetailPage({
         </section>
 
         <section className={styles.placeholderGrid}>
-          {["Risks", "Issues", "Weekly Reports"].map(
+          {["Issues", "Weekly Reports"].map(
             (moduleName) => (
               <div className={styles.placeholderPanel} key={moduleName}>
                 <h3>{moduleName}</h3>
@@ -158,6 +164,16 @@ export default async function ProjectDetailPage({
               href={`/projects/${project.id}/meetings`}
             >
               View Meetings
+            </Link>
+          </div>
+          <div className={styles.placeholderPanel}>
+            <h3>Risks</h3>
+            <p>Track project risks, severity, owners, and review dates.</p>
+            <Link
+              className={styles.secondaryButton}
+              href={`/projects/${project.id}/risks`}
+            >
+              View Risks
             </Link>
           </div>
         </section>

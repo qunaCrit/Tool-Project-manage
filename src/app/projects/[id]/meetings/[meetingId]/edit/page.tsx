@@ -64,7 +64,7 @@ export default async function EditMeetingPage({
           >
             Meetings
           </Link>
-          <span>Risks</span>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <span>Issues</span>
           <span>Weekly Reports</span>
         </nav>

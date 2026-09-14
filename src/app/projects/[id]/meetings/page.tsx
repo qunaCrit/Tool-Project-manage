@@ -86,7 +86,7 @@ export default async function MeetingsPage({
           >
             Meetings
           </Link>
-          <span>Risks</span>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <span>Issues</span>
           <span>Weekly Reports</span>
         </nav>

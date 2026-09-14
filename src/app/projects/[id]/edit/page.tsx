@@ -41,9 +41,9 @@ export default async function EditProjectPage({
             Projects
           </Link>
           <Link href={`/projects/${project.id}`}>Project Overview</Link>
-          <span>Work Items</span>
-          <span>Meetings</span>
-          <span>Risks</span>
+          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
+          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <span>Issues</span>
           <span>Weekly Reports</span>
         </nav>

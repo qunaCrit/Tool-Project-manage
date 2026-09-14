@@ -1,27 +1,21 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { db } from "@/db";
-import { projects, workItems } from "@/db/schema";
-import { WorkItemForm } from "../../work-item-form";
-import styles from "../../../../../page.module.css";
+import { projects } from "@/db/schema";
+import { RiskForm } from "../risk-form";
+import styles from "../../../../page.module.css";
 
-export default async function EditWorkItemPage({
+export default async function NewRiskPage({
   params,
 }: {
-  params: Promise<{ id: string; workItemId: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { id, workItemId } = await params;
+  const { id } = await params;
   const projectId = Number(id);
-  const selectedWorkItemId = Number(workItemId);
 
-  if (
-    !Number.isInteger(projectId) ||
-    projectId <= 0 ||
-    !Number.isInteger(selectedWorkItemId) ||
-    selectedWorkItemId <= 0
-  ) {
+  if (!Number.isInteger(projectId) || projectId <= 0) {
     notFound();
   }
 
@@ -35,39 +29,24 @@ export default async function EditWorkItemPage({
     notFound();
   }
 
-  const [workItem] = await db
-    .select()
-    .from(workItems)
-    .where(
-      and(
-        eq(workItems.id, selectedWorkItemId),
-        eq(workItems.projectId, project.id),
-      ),
-    )
-    .limit(1);
-
-  if (!workItem) {
-    notFound();
-  }
-
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Work Items</h1>
+          <h1>Risks</h1>
         </div>
         <nav className={styles.nav}>
           <Link href="/projects">Projects</Link>
           <Link href={`/projects/${project.id}`}>Project Overview</Link>
+          <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
+          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
           <Link
             className={styles.activeNavItem}
-            href={`/projects/${project.id}/work-items`}
+            href={`/projects/${project.id}/risks`}
           >
-            Work Items
+            Risks
           </Link>
-          <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
-          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <span>Issues</span>
           <span>Weekly Reports</span>
         </nav>
@@ -77,16 +56,16 @@ export default async function EditWorkItemPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Edit work item</h2>
+            <h2>New risk</h2>
           </div>
           <Link
             className={styles.secondaryButton}
-            href={`/projects/${project.id}/work-items`}
+            href={`/projects/${project.id}/risks`}
           >
-            Back to work items
+            Back to risks
           </Link>
         </header>
-        <WorkItemForm projectId={project.id} workItem={workItem} />
+        <RiskForm projectId={project.id} />
       </section>
     </main>
   );
