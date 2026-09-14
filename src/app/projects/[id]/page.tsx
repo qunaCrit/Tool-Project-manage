@@ -62,6 +62,16 @@ const reportStatusLabels: Record<ReportStatus, string> = {
 
 const formatValue = (value: string | null) => value || "-";
 
+const formatDate = (value: string | null) => {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(
+    new Date(`${value}T00:00:00`),
+  );
+};
+
 const todayInput = () => new Date().toISOString().slice(0, 10);
 
 const formatDateTime = (value: Date) =>
@@ -144,6 +154,9 @@ export default async function ProjectDetailPage({
     .filter((item) => item.status !== "DONE" && item.dueDate)
     .sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""))
     .slice(0, 5);
+  const overdueWorkItems = projectWorkItems
+    .filter((item) => item.status !== "DONE" && item.dueDate && item.dueDate < today)
+    .sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""));
   const openRisks = projectRisks.filter((risk) =>
     ["OPEN", "MONITORING"].includes(risk.status),
   );
@@ -156,6 +169,16 @@ export default async function ProjectDetailPage({
   );
   const unassignedIssues = openIssues.filter((issue) => !issue.owner);
   const latestWeeklyReport = latestReport[0];
+  const actionItemCountByMeeting = new Map<number, number>();
+
+  for (const item of projectWorkItems) {
+    if (item.type === "ACTION_ITEM" && item.meetingId) {
+      actionItemCountByMeeting.set(
+        item.meetingId,
+        (actionItemCountByMeeting.get(item.meetingId) ?? 0) + 1,
+      );
+    }
+  }
 
   return (
     <main className={styles.shell}>
@@ -243,11 +266,11 @@ export default async function ProjectDetailPage({
               </div>
               <div>
                 <dt>Start date</dt>
-                <dd>{formatValue(project.startDate)}</dd>
+                <dd>{formatDate(project.startDate)}</dd>
               </div>
               <div>
                 <dt>End date</dt>
-                <dd>{formatValue(project.endDate)}</dd>
+                <dd>{formatDate(project.endDate)}</dd>
               </div>
             </dl>
           </div>
@@ -300,6 +323,9 @@ export default async function ProjectDetailPage({
                 <strong>{workSummary.overdue}</strong>
                 <span>Overdue</span>
               </div>
+            </div>
+            <div className={styles.progressTrack} aria-label="Work completion">
+              <span style={{ width: `${completion}%` }} />
             </div>
             <p>{completion}% complete, {workSummary.blocked} blocked.</p>
           </div>
@@ -393,7 +419,10 @@ export default async function ProjectDetailPage({
                   <Link href={`/projects/${project.id}/meetings/${meeting.id}`}>
                     {meeting.title}
                   </Link>
-                  <span>{formatDateTime(meeting.meetingDate)}</span>
+                  <span>
+                    {formatDateTime(meeting.meetingDate)} |{" "}
+                    {actionItemCountByMeeting.get(meeting.id) ?? 0} action items
+                  </span>
                 </li>
               ))}
               {recentMeetings.length === 0 ? <li>No meetings yet.</li> : null}
@@ -455,8 +484,15 @@ export default async function ProjectDetailPage({
                   <Link href={`/projects/${project.id}/work-items/${item.id}/edit`}>
                     {item.title}
                   </Link>
-                  <span>
-                    {workItemStatusLabels[item.status]} | Due {item.dueDate}
+                  <span
+                    className={
+                      overdueWorkItems.some((overdue) => overdue.id === item.id)
+                        ? styles.overdueText
+                        : undefined
+                    }
+                  >
+                    {item.dueDate && item.dueDate < today ? "Overdue" : "Due"}{" "}
+                    {formatDate(item.dueDate)} | {workItemStatusLabels[item.status]}
                   </span>
                 </li>
               ))}

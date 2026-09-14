@@ -7,7 +7,10 @@
 }
 
 .sidebar {
+  position: sticky;
+  top: 0;
   display: flex;
+  height: 100vh;
   flex-direction: column;
   gap: 28px;
   border-right: 1px solid #e5e7eb;
@@ -46,6 +49,10 @@
 
 .nav span {
   color: #9ca3af;
+}
+
+.nav a:hover {
+  background: #f3f4f6;
 }
 
 .activeNavItem {
@@ -116,6 +123,14 @@
   opacity: 0.65;
 }
 
+.secondaryButton:hover {
+  background: #f9fafb;
+}
+
+.dangerButton:hover {
+  background: #fef2f2;
+}
+
 .emptyState,
 .panel,
 .placeholderPanel,
@@ -126,6 +141,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .emptyState {
@@ -242,11 +258,12 @@
 .filterBar {
   display: grid;
   align-items: end;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   padding: 18px;
 }
 
@@ -399,6 +416,21 @@
   text-transform: uppercase;
 }
 
+.progressTrack {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e7eb;
+  margin-bottom: 12px;
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+}
+
 .compactList {
   display: flex;
   flex-direction: column;
@@ -432,6 +464,11 @@
   white-space: nowrap;
 }
 
+.compactList .overdueText {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
 .stack {
   display: flex;
   align-items: flex-start;
@@ -452,6 +489,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   padding: 20px;
 }
 
@@ -514,8 +552,15 @@
   }
 
   .sidebar {
+    position: static;
+    height: auto;
     border-right: 0;
     border-bottom: 1px solid #e5e7eb;
+  }
+
+  .nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .header,
@@ -524,12 +569,12 @@
     flex-direction: column;
   }
 
-    .formGrid,
-    .overviewGrid,
-    .detailList,
-    .reportLayout,
-    .placeholderGrid,
-    .filterBar {
+  .formGrid,
+  .overviewGrid,
+  .detailList,
+  .reportLayout,
+  .placeholderGrid,
+  .filterBar {
     grid-template-columns: 1fr;
   }
 

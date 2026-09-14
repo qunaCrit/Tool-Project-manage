@@ -74,10 +74,36 @@ export function WeeklyReportForm({
     : createWeeklyReportAction.bind(null, projectId);
   const [state, formAction, isPending] = useActionState(action, initialState);
   const copyText = buildCopyText(report);
+  const copyCurrentReport = () => {
+    const form = document.getElementById("weekly-report-form");
+
+    if (!(form instanceof HTMLFormElement)) {
+      return;
+    }
+
+    const formData = new FormData(form);
+    const currentReport: WeeklyReportFormReport = {
+      weekStart: String(formData.get("weekStart") ?? ""),
+      weekEnd: String(formData.get("weekEnd") ?? ""),
+      overallStatus: String(
+        formData.get("overallStatus") ?? "GREEN",
+      ) as ReportStatus,
+      summary: String(formData.get("summary") ?? ""),
+      completedWork: String(formData.get("completedWork") ?? ""),
+      ongoingWork: String(formData.get("ongoingWork") ?? ""),
+      upcomingWork: String(formData.get("upcomingWork") ?? ""),
+      risks: String(formData.get("risks") ?? ""),
+      issues: String(formData.get("issues") ?? ""),
+      decisions: String(formData.get("decisions") ?? ""),
+      notes: String(formData.get("notes") ?? ""),
+    };
+
+    navigator.clipboard.writeText(buildCopyText(currentReport));
+  };
 
   return (
     <div className={styles.reportLayout}>
-      <form action={formAction} className={styles.form}>
+      <form action={formAction} className={styles.form} id="weekly-report-form">
         {state.error ? <p className={styles.formError}>{state.error}</p> : null}
 
         <div className={styles.formGrid}>
@@ -197,7 +223,7 @@ export function WeeklyReportForm({
           <button
             className={styles.secondaryButton}
             type="button"
-            onClick={() => navigator.clipboard.writeText(copyText)}
+            onClick={copyCurrentReport}
           >
             Copy Report
           </button>

@@ -2,7 +2,14 @@ import { desc } from "drizzle-orm";
 import Link from "next/link";
 
 import { db } from "@/db";
-import { projects, type ProjectStatus } from "@/db/schema";
+import {
+  issues,
+  projects,
+  risks,
+  workItems,
+  projectStatuses,
+  type ProjectStatus,
+} from "@/db/schema";
 import { DeleteProjectButton } from "./delete-project-button";
 import styles from "../page.module.css";
 
@@ -18,18 +25,77 @@ const errorMessages: Record<string, string> = {
   "delete-failed": "Could not delete the project. Please try again.",
 };
 
-const formatDate = (value: string | null) => value || "-";
+const formatDate = (value: string | null) => {
+  if (!value) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(
+    new Date(`${value}T00:00:00`),
+  );
+};
 
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; q?: string; status?: string }>;
 }) {
-  const { error } = await searchParams;
-  const projectList = await db
+  const { error, q, status } = await searchParams;
+  const searchQuery = typeof q === "string" ? q.trim() : "";
+  const selectedStatus =
+    typeof status === "string" &&
+    projectStatuses.includes(status as ProjectStatus)
+      ? (status as ProjectStatus)
+      : "";
+  const [allProjects, allWorkItems, allRisks, allIssues] = await Promise.all([
+    db
     .select()
     .from(projects)
-    .orderBy(desc(projects.updatedAt));
+      .orderBy(desc(projects.updatedAt)),
+    db.select().from(workItems),
+    db.select().from(risks),
+    db.select().from(issues),
+  ]);
+
+  const projectList = allProjects
+    .filter((project) =>
+      selectedStatus ? project.status === selectedStatus : true,
+    )
+    .filter((project) =>
+      searchQuery
+        ? project.name.toLowerCase().includes(searchQuery.toLowerCase())
+        : true,
+    );
+
+  const openWorkItemCounts = new Map<number, number>();
+  const openRiskIssueCounts = new Map<number, number>();
+
+  for (const item of allWorkItems) {
+    if (item.status !== "DONE") {
+      openWorkItemCounts.set(
+        item.projectId,
+        (openWorkItemCounts.get(item.projectId) ?? 0) + 1,
+      );
+    }
+  }
+
+  for (const risk of allRisks) {
+    if (risk.status === "OPEN" || risk.status === "MONITORING") {
+      openRiskIssueCounts.set(
+        risk.projectId,
+        (openRiskIssueCounts.get(risk.projectId) ?? 0) + 1,
+      );
+    }
+  }
+
+  for (const issue of allIssues) {
+    if (issue.status === "OPEN" || issue.status === "IN_PROGRESS") {
+      openRiskIssueCounts.set(
+        issue.projectId,
+        (openRiskIssueCounts.get(issue.projectId) ?? 0) + 1,
+      );
+    }
+  }
 
   return (
     <main className={styles.shell}>
@@ -66,12 +132,45 @@ export default async function ProjectsPage({
           <p className={styles.formError}>{errorMessages[error]}</p>
         ) : null}
 
+        <form className={styles.filterBar}>
+          <label className={styles.field}>
+            <span>Search</span>
+            <input
+              name="q"
+              type="search"
+              defaultValue={searchQuery}
+              placeholder="Project name"
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span>Status</span>
+            <select name="status" defaultValue={selectedStatus}>
+              <option value="">All statuses</option>
+              {projectStatuses.map((projectStatus) => (
+                <option key={projectStatus} value={projectStatus}>
+                  {statusLabels[projectStatus]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className={styles.filterActions}>
+            <button className={styles.primaryButton} type="submit">
+              Apply filters
+            </button>
+            <Link className={styles.secondaryButton} href="/projects">
+              Reset
+            </Link>
+          </div>
+        </form>
+
         {projectList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No projects yet</h3>
-            <p>Create the first project to start using the MVP.</p>
+            <h3>No projects found</h3>
+            <p>Create a project or adjust the current filters.</p>
             <Link className={styles.primaryButton} href="/projects/new">
-              Create first project
+              Create Project
             </Link>
           </div>
         ) : (
@@ -82,8 +181,9 @@ export default async function ProjectsPage({
                   <th>Name</th>
                   <th>Status</th>
                   <th>Owner</th>
-                  <th>Start date</th>
                   <th>End date</th>
+                  <th>Open work items</th>
+                  <th>Open risks/issues</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -101,8 +201,9 @@ export default async function ProjectsPage({
                       </span>
                     </td>
                     <td>{project.owner || "-"}</td>
-                    <td>{formatDate(project.startDate)}</td>
                     <td>{formatDate(project.endDate)}</td>
+                    <td>{openWorkItemCounts.get(project.id) ?? 0}</td>
+                    <td>{openRiskIssueCounts.get(project.id) ?? 0}</td>
                     <td>
                       <div className={styles.actionRow}>
                         <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
