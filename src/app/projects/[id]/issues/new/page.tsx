@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { RiskForm } from "../risk-form";
+import { IssueForm } from "../issue-form";
 import styles from "../../../../page.module.css";
 
-export default async function NewRiskPage({
+export default async function NewIssuePage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -34,20 +34,20 @@ export default async function NewRiskPage({
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Risks</h1>
+          <h1>Issues</h1>
         </div>
         <nav className={styles.nav}>
           <Link href="/projects">Projects</Link>
           <Link href={`/projects/${project.id}`}>Project Overview</Link>
           <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
           <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <Link
             className={styles.activeNavItem}
-            href={`/projects/${project.id}/risks`}
+            href={`/projects/${project.id}/issues`}
           >
-            Risks
+            Issues
           </Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
             Weekly Reports
           </Link>
@@ -58,16 +58,16 @@ export default async function NewRiskPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>New risk</h2>
+            <h2>New issue</h2>
           </div>
           <Link
             className={styles.secondaryButton}
-            href={`/projects/${project.id}/risks`}
+            href={`/projects/${project.id}/issues`}
           >
-            Back to risks
+            Back to issues
           </Link>
         </header>
-        <RiskForm projectId={project.id} />
+        <IssueForm projectId={project.id} />
       </section>
     </main>
   );

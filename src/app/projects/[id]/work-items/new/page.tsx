@@ -47,8 +47,10 @@ export default async function NewWorkItemPage({
           </Link>
           <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
           <Link href={`/projects/${project.id}/risks`}>Risks</Link>
-          <span>Issues</span>
-          <span>Weekly Reports</span>
+          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
+          <Link href={`/projects/${project.id}/weekly-reports`}>
+            Weekly Reports
+          </Link>
         </nav>
       </aside>
 

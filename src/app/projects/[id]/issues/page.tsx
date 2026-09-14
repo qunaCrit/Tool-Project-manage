@@ -4,44 +4,32 @@ import { notFound } from "next/navigation";
 
 import { db } from "@/db";
 import {
+  issueStatuses,
+  issues,
+  priorities,
   projects,
-  risks,
-  riskSeverities,
-  riskStatuses,
-  type RiskLevel,
-  type RiskSeverity,
-  type RiskStatus,
+  type IssueStatus,
+  type Priority,
 } from "@/db/schema";
-import { DeleteRiskButton } from "./delete-risk-button";
+import { DeleteIssueButton } from "./delete-issue-button";
 import styles from "../../../page.module.css";
 
-const levelLabels: Record<RiskLevel, string> = {
+const priorityLabels: Record<Priority, string> = {
   LOW: "Low",
   MEDIUM: "Medium",
   HIGH: "High",
+  CRITICAL: "Critical",
 };
 
-const severityLabels: Record<RiskSeverity, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-};
-
-const severityClasses: Record<RiskSeverity, string> = {
-  LOW: styles.severityLOW,
-  MEDIUM: styles.severityMEDIUM,
-  HIGH: styles.severityHIGH,
-};
-
-const statusLabels: Record<RiskStatus, string> = {
+const statusLabels: Record<IssueStatus, string> = {
   OPEN: "Open",
-  MONITORING: "Monitoring",
-  MITIGATED: "Mitigated",
+  IN_PROGRESS: "In progress",
+  RESOLVED: "Resolved",
   CLOSED: "Closed",
 };
 
 const errorMessages: Record<string, string> = {
-  "delete-failed": "Could not delete the risk. Please try again.",
+  "delete-failed": "Could not delete the issue. Please try again.",
 };
 
 const formatValue = (value: string | null) => value || "-";
@@ -51,15 +39,14 @@ const isValidFilter = <T extends string>(
   validValues: readonly T[],
 ): value is T => Boolean(value && validValues.includes(value as T));
 
-export default async function RisksPage({
+export default async function IssuesPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{
     status?: string;
-    severity?: string;
-    owner?: string;
+    priority?: string;
     error?: string;
   }>;
 }) {
@@ -80,51 +67,46 @@ export default async function RisksPage({
     notFound();
   }
 
-  const { status, severity, owner, error } = await searchParams;
-  const selectedStatus = isValidFilter(status, riskStatuses) ? status : undefined;
-  const selectedSeverity = isValidFilter(severity, riskSeverities)
-    ? severity
+  const { status, priority, error } = await searchParams;
+  const selectedStatus = isValidFilter(status, issueStatuses) ? status : undefined;
+  const selectedPriority = isValidFilter(priority, priorities)
+    ? priority
     : undefined;
-  const selectedOwner = typeof owner === "string" ? owner.trim() : "";
-  const filters: SQL[] = [eq(risks.projectId, projectId)];
+  const filters: SQL[] = [eq(issues.projectId, projectId)];
 
   if (selectedStatus) {
-    filters.push(eq(risks.status, selectedStatus));
+    filters.push(eq(issues.status, selectedStatus));
   }
 
-  if (selectedSeverity) {
-    filters.push(eq(risks.severity, selectedSeverity));
+  if (selectedPriority) {
+    filters.push(eq(issues.priority, selectedPriority));
   }
 
-  if (selectedOwner) {
-    filters.push(eq(risks.owner, selectedOwner));
-  }
-
-  const riskList = await db
+  const issueList = await db
     .select()
-    .from(risks)
+    .from(issues)
     .where(and(...filters))
-    .orderBy(desc(risks.updatedAt));
+    .orderBy(desc(issues.updatedAt));
 
   return (
     <main className={styles.shell}>
       <aside className={styles.sidebar}>
         <div>
           <p className={styles.eyebrow}>Local PM Assistant</p>
-          <h1>Risks</h1>
+          <h1>Issues</h1>
         </div>
         <nav className={styles.nav}>
           <Link href="/projects">Projects</Link>
           <Link href={`/projects/${project.id}`}>Project Overview</Link>
           <Link href={`/projects/${project.id}/work-items`}>Work Items</Link>
           <Link href={`/projects/${project.id}/meetings`}>Meetings</Link>
+          <Link href={`/projects/${project.id}/risks`}>Risks</Link>
           <Link
             className={styles.activeNavItem}
-            href={`/projects/${project.id}/risks`}
+            href={`/projects/${project.id}/issues`}
           >
-            Risks
+            Issues
           </Link>
-          <Link href={`/projects/${project.id}/issues`}>Issues</Link>
           <Link href={`/projects/${project.id}/weekly-reports`}>
             Weekly Reports
           </Link>
@@ -135,7 +117,7 @@ export default async function RisksPage({
         <header className={styles.header}>
           <div>
             <p className={styles.eyebrow}>{project.name}</p>
-            <h2>Risks</h2>
+            <h2>Issues</h2>
           </div>
           <div className={styles.actionRow}>
             <Link className={styles.secondaryButton} href={`/projects/${project.id}`}>
@@ -143,9 +125,9 @@ export default async function RisksPage({
             </Link>
             <Link
               className={styles.primaryButton}
-              href={`/projects/${project.id}/risks/new`}
+              href={`/projects/${project.id}/issues/new`}
             >
-              Add Risk
+              Add Issue
             </Link>
           </div>
         </header>
@@ -159,29 +141,24 @@ export default async function RisksPage({
             <span>Status</span>
             <select name="status" defaultValue={selectedStatus ?? ""}>
               <option value="">All statuses</option>
-              {riskStatuses.map((riskStatus) => (
-                <option key={riskStatus} value={riskStatus}>
-                  {statusLabels[riskStatus]}
+              {issueStatuses.map((issueStatus) => (
+                <option key={issueStatus} value={issueStatus}>
+                  {statusLabels[issueStatus]}
                 </option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span>Severity</span>
-            <select name="severity" defaultValue={selectedSeverity ?? ""}>
-              <option value="">All severities</option>
-              {riskSeverities.map((riskSeverity) => (
-                <option key={riskSeverity} value={riskSeverity}>
-                  {severityLabels[riskSeverity]}
+            <span>Priority</span>
+            <select name="priority" defaultValue={selectedPriority ?? ""}>
+              <option value="">All priorities</option>
+              {priorities.map((issuePriority) => (
+                <option key={issuePriority} value={issuePriority}>
+                  {priorityLabels[issuePriority]}
                 </option>
               ))}
             </select>
-          </label>
-
-          <label className={styles.field}>
-            <span>Owner</span>
-            <input name="owner" type="text" defaultValue={selectedOwner} />
           </label>
 
           <div className={styles.filterActions}>
@@ -190,22 +167,22 @@ export default async function RisksPage({
             </button>
             <Link
               className={styles.secondaryButton}
-              href={`/projects/${project.id}/risks`}
+              href={`/projects/${project.id}/issues`}
             >
               Reset
             </Link>
           </div>
         </form>
 
-        {riskList.length === 0 ? (
+        {issueList.length === 0 ? (
           <div className={styles.emptyState}>
-            <h3>No risks found</h3>
-            <p>Add the first risk for this project.</p>
+            <h3>No issues found</h3>
+            <p>Add the first issue for this project.</p>
             <Link
               className={styles.primaryButton}
-              href={`/projects/${project.id}/risks/new`}
+              href={`/projects/${project.id}/issues/new`}
             >
-              Add Risk
+              Add Issue
             </Link>
           </div>
         ) : (
@@ -214,9 +191,8 @@ export default async function RisksPage({
               <thead>
                 <tr>
                   <th>Title</th>
-                  <th>Probability</th>
+                  <th>Priority</th>
                   <th>Impact</th>
-                  <th>Severity</th>
                   <th>Owner</th>
                   <th>Status</th>
                   <th>Due date</th>
@@ -224,51 +200,37 @@ export default async function RisksPage({
                 </tr>
               </thead>
               <tbody>
-                {riskList.map((risk) => (
-                  <tr
-                    className={
-                      risk.severity === "HIGH" ? styles.highSeverityRow : undefined
-                    }
-                    key={risk.id}
-                  >
+                {issueList.map((issue) => (
+                  <tr key={issue.id}>
                     <td>
                       <Link
                         className={styles.projectLink}
-                        href={`/projects/${project.id}/risks/${risk.id}/edit`}
+                        href={`/projects/${project.id}/issues/${issue.id}/edit`}
                       >
-                        {risk.title}
+                        {issue.title}
                       </Link>
                     </td>
-                    <td>{levelLabels[risk.probability]}</td>
-                    <td>{levelLabels[risk.impact]}</td>
-                    <td>
-                      <span
-                        className={`${styles.severityPill} ${
-                          severityClasses[risk.severity]
-                        }`}
-                      >
-                        {severityLabels[risk.severity]}
-                      </span>
-                    </td>
-                    <td>{formatValue(risk.owner)}</td>
+                    <td>{priorityLabels[issue.priority]}</td>
+                    <td>{formatValue(issue.impact)}</td>
+                    <td>{formatValue(issue.owner)}</td>
                     <td>
                       <span className={styles.statusPill}>
-                        {statusLabels[risk.status]}
+                        {statusLabels[issue.status]}
                       </span>
                     </td>
-                    <td>{formatValue(risk.dueDate)}</td>
+                    <td>{formatValue(issue.dueDate)}</td>
                     <td>
                       <div className={styles.actionRow}>
                         <Link
                           className={styles.secondaryButton}
-                          href={`/projects/${project.id}/risks/${risk.id}/edit`}
+                          href={`/projects/${project.id}/issues/${issue.id}/edit`}
                         >
                           Edit
                         </Link>
-                        <DeleteRiskButton
+                        <DeleteIssueButton
                           projectId={project.id}
-                          riskId={risk.id}
-                          riskTitle={risk.title}
+                          issueId={issue.id}
+                          issueTitle={issue.title}
                         />
                       </div>
                     </td>

@@ -369,6 +369,104 @@
   font-size: 15px;
 }
 
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metricGrid div {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  padding: 12px;
+}
+
+.metricGrid strong {
+  display: block;
+  color: #111827;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.metricGrid span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+.compactList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.compactList li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #eef2f7;
+  color: #374151;
+  font-size: 14px;
+  padding-bottom: 10px;
+}
+
+.compactList li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.compactList a {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.compactList span {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.stack {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reportLayout {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 18px;
+}
+
+.copyPanel {
+  position: sticky;
+  top: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.copyPanel pre {
+  overflow: auto;
+  max-height: 720px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #111827;
+  font: 13px/1.6 Arial, Helvetica, sans-serif;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
 .placeholderGrid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -426,11 +524,24 @@
     flex-direction: column;
   }
 
-  .formGrid,
-  .overviewGrid,
-  .detailList,
-  .placeholderGrid,
-  .filterBar {
+    .formGrid,
+    .overviewGrid,
+    .detailList,
+    .reportLayout,
+    .placeholderGrid,
+    .filterBar {
     grid-template-columns: 1fr;
+  }
+
+  .copyPanel {
+    position: static;
+  }
+
+  .compactList li {
+    flex-direction: column;
+  }
+
+  .compactList span {
+    white-space: normal;
   }
 }
